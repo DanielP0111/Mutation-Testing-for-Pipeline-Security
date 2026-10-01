@@ -1,0 +1,6 @@
+project('myproject', 'c', version : '1.0')
+
+zlib_dep = dependency('zlib', required : true)
+openssl_dep = dependency('openssl', required : false)
+
+executable('myapp', 'main.c', dependencies : [zlib_dep, openssl_dep])
