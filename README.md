@@ -11,34 +11,34 @@ This project asks how well does an existing defense tool (**PipelineSave**) actu
 ## What We're Building
 
 1. **A taxonomy of real attacks.** A structured database of 50+ documented pipeline attacks, each classified by where in the build it strikes and how it works.
-2. **A library of mutation operators.** Abstract templates describing categories of attack that can be applied to any compatible build file. 
-3. **A placement engine.** Python code that reads a real Meson build file and decides where and how to inject each operator, at four difficulty levels. 
-4. **A benchmark of 500+ mutants.** Auto-generated modified build files across three real open-source projects, each labeled with its attack type and difficulty. 
+2. **A library of mutation operators.** Abstract templates describing categories of attack that can be applied to any compatible build file.
+3. **A placement engine.** Python code that reads a real Meson build file and decides where and how to inject each operator, at four difficulty levels.
+4. **A benchmark of 500+ mutants.** Auto-generated modified build files across three real open-source projects, each labeled with its attack type and difficulty.
 5. **An evaluation.** Running PipelineSave against every mutant and recording BLOCKED, DETECTED, or MISSED.
 
 ---
 
 ## Repository Layout
 
-| Folder | What it contains |
-|---|---|
-| `src/` | All Python source code — the Meson parser, mutation engine, and placement algorithms |
-| `data/` | All data files — attack records, operator specs, generated mutants, and evaluation results |
-| `tests/` | Automated tests for the code in `src/` |
-| `scripts/` | Helper scripts for setup, benchmark generation, and running evaluations |
-| `docs/` | Write-ups, diagrams, and the ACM report drafts |
-| `.github/` | CI workflow |
+| Folder     | What it contains                                                                           |
+| ---------- | ------------------------------------------------------------------------------------------ |
+| `src/`     | All Python source code — the Meson parser, mutation engine, and placement algorithms       |
+| `data/`    | All data files — attack records, operator specs, generated mutants, and evaluation results |
+| `tests/`   | Automated tests for the code in `src/`                                                     |
+| `scripts/` | Helper scripts for setup, benchmark generation, and running evaluations                    |
+| `docs/`    | Write-ups, diagrams, and the ACM report drafts                                             |
+| `.github/` | CI workflow                                                                                |
 
 ---
 
 ## Team
 
-| Name | Role |
-|---|---|
+| Name        | Role                                                                     |
+| ----------- | ------------------------------------------------------------------------ |
 | **Rejoice** | Attack taxonomy — collecting and classifying real-world pipeline attacks |
-| **Debora** | Mutation operators — designing abstract attack templates |
-| **David** | Placement strategies — algorithms for finding attack injection sites |
-| **Daniel** | Engine — Meson parser, mutant generator, repo infrastructure |
+| **Debora**  | Mutation operators — designing abstract attack templates                 |
+| **David**   | Placement strategies — algorithms for finding attack injection sites     |
+| **Daniel**  | Engine — Meson parser, mutant generator, repo infrastructure             |
 
 ## Getting Started
 
@@ -52,20 +52,3 @@ pip install -r src/requirements.txt
 # Set up the three target Meson projects
 bash scripts/setup_targets.sh
 ```
-
----
-
-## Glossary
-
-| Term | Plain-language meaning |
-|---|---|
-| **Build pipeline** | The automated process that compiles, tests, and packages software |
-| **Mutant** | A modified build file with a simulated attack injected into it |
-| **Mutation operator** | A template describing one category of pipeline attack |
-| **Placement** | The strategy for deciding where in a build file to inject an attack |
-| **PipelineSave** | The static analysis defense tool this project evaluates |
-| **BLOCKED** | PipelineSave stopped the attack from running |
-| **DETECTED** | PipelineSave flagged it but didn't stop it |
-| **MISSED** | PipelineSave didn't catch it at all |
-| **Meson** | The build system used by all three target projects |
-| **Wrap file** | A Meson file that downloads a dependency from the internet — a common attack surface |
