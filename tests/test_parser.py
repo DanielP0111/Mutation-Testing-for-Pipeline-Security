@@ -48,6 +48,32 @@ class TestParseWrapFile:
         )
         result = parse_wrap_file(str(git_wrap))
         assert result["directory"] == "mything"
+        assert result["type"] == "wrap-git"
+
+    def test_wrap_git_url_used_as_source_url(self, tmp_path: Path):
+        """A [wrap-git] with only url (no source_url) must still expose
+        source_url and derive directory from the url stem."""
+        git_wrap = tmp_path / "libfoo.wrap"
+        git_wrap.write_text(
+            "[wrap-git]\n"
+            "url = https://github.com/example/libfoo.git\n"
+            "revision = v1.2.3\n"
+        )
+        result = parse_wrap_file(str(git_wrap))
+        assert result["url"] == "https://github.com/example/libfoo.git"
+        assert result["source_url"] == result["url"]
+        assert result["directory"] == "libfoo"
+        assert result["revision"] == "v1.2.3"
+
+    def test_wrap_git_missing_url_raises(self, tmp_path: Path):
+        git_wrap = tmp_path / "nourl.wrap"
+        git_wrap.write_text("[wrap-git]\nrevision = main\n")
+        with pytest.raises(ValueError, match="Missing required field"):
+            parse_wrap_file(str(git_wrap))
+
+    def test_wrap_file_exposes_type(self, example_wrap_path: str):
+        result = parse_wrap_file(example_wrap_path)
+        assert result["type"] == "wrap-file"
 
     def test_missing_required_field_raises_value_error(self, tmp_path: Path):
         incomplete = tmp_path / "incomplete.wrap"
@@ -101,7 +127,8 @@ class TestParseProject:
     def test_returns_expected_keys(self, project_with_wrap: Path):
         result = parse_project(str(project_with_wrap))
         assert set(result.keys()) == {
-            "project_dir", "wrap_files", "conditionals", "dependencies"
+            "project_dir", "wrap_files", "conditionals", "dependencies",
+            "build_calls", "option_reads",
         }
 
     def test_project_dir_matches_input(self, project_with_wrap: Path):
@@ -173,3 +200,25 @@ class TestParseProject:
         result = parse_project(str(project_with_conditionals))
         deep = [c for c in result["conditionals"] if c["depth"] >= 2]
         assert len(deep) >= 1
+
+    # -----------------------------------------------------------------------
+    # Build calls and option reads (hook-point surfaces)
+    # -----------------------------------------------------------------------
+
+    def test_option_reads_found(self, project_with_conditionals: Path):
+        """The conditional fixture gates branches on get_option('feature-x')
+        and get_option('feature-y')."""
+        result = parse_project(str(project_with_conditionals))
+        options = {r["option"] for r in result["option_reads"]}
+        assert {"feature-x", "feature-y"} <= options
+
+    def test_build_calls_found(self, tmp_path: Path):
+        (tmp_path / "meson.build").write_text(
+            "project('bc', 'c')\n"
+            "r = run_command('sh', '-c', 'true', check : false)\n"
+            "custom_target('gen', output : 'g.c', command : ['./g.sh'])\n"
+        )
+        result = parse_project(str(tmp_path))
+        kinds = {c["call"] for c in result["build_calls"]}
+        assert "run_command" in kinds
+        assert "custom_target" in kinds

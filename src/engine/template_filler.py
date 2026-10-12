@@ -34,7 +34,16 @@ def fill_template(operator: dict, candidate: dict) -> dict:
                     operator's placeholders section and the candidate's
                     placeholder_map use mismatched keys).
     """
-    placeholder_map = candidate.get("placeholder_map", {})
+    # Two sources of placeholder values:
+    #   - candidate.placeholder_map : values read from the target project
+    #                                 (e.g. WRAP_FILE, ORIGINAL_URL)
+    #   - operator.attacker_values  : values the attacker supplies, which the
+    #                                 target cannot (e.g. MALICIOUS_URL)
+    # They use disjoint keys; attacker_values fills what the project can't.
+    placeholder_map = {
+        **operator.get("attacker_values", {}),
+        **candidate.get("placeholder_map", {}),
+    }
 
     def resolve(value: str) -> str:
         """Replace every {{KEY}} in value with the corresponding real value."""
@@ -62,6 +71,7 @@ def fill_template(operator: dict, candidate: dict) -> dict:
         "field":             candidate.get("field", ""),
         "original_value":    candidate.get("current_value", ""),
         "replacement_value": resolve(template.get("replacement_value", "")),
-        "scheme":            candidate.get("scheme", ""),
+        "mode":              operator.get("mode", "replace"),
+        "scheme":            candidate.get("scheme", operator.get("scheme", "")),
         "difficulty":        candidate.get("difficulty", 1),
     }

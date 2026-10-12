@@ -74,6 +74,7 @@ def generate_mutant(
 
     original_value = filled_operator["original_value"]
     replacement_value = filled_operator["replacement_value"]
+    mode = filled_operator.get("mode", "replace")
 
     text = target_file.read_text(encoding="utf-8", errors="replace")
 
@@ -81,11 +82,54 @@ def generate_mutant(
         # The expected value wasn't found — record but mark as not applied
         return _mutant_record(filled_operator, str(dst_root), applied=False)
 
-    # Apply the single replacement (first occurrence only, for determinism)
-    new_text = text.replace(original_value, replacement_value, 1)
+    new_text = _apply_change(text, mode, original_value, replacement_value)
+    if new_text is None or new_text == text:
+        # Mode could not produce a change (e.g. value only inside a longer
+        # token for a line mode) — record but mark as not applied.
+        return _mutant_record(filled_operator, str(dst_root), applied=False)
+
     target_file.write_text(new_text, encoding="utf-8")
 
     return _mutant_record(filled_operator, str(dst_root), applied=True)
+
+
+def _apply_change(
+    text: str, mode: str, original_value: str, replacement_value: str
+) -> str | None:
+    """
+    Produce the mutated text for a given mode, changing exactly one location.
+
+    Modes:
+      replace      — swap the first occurrence of original_value for
+                     replacement_value (used for URL/field substitution).
+      delete_line  — remove the first line that contains original_value
+                     (used for checksum/guard removal).
+      insert_after — insert replacement_value as its own line immediately
+                     after the first line containing original_value (used for
+                     appending an extra command next to a legitimate one).
+
+    Returns the new text, or None if the mode is unknown.
+    """
+    if mode == "replace":
+        return text.replace(original_value, replacement_value, 1)
+
+    # Line-oriented modes preserve the file's original newline style.
+    newline = "\r\n" if "\r\n" in text else "\n"
+    lines = text.split(newline)
+
+    for idx, line in enumerate(lines):
+        if original_value in line:
+            if mode == "delete_line":
+                del lines[idx]
+            elif mode == "insert_after":
+                # Match the indentation of the anchor line for a tidy insert.
+                indent = line[: len(line) - len(line.lstrip())]
+                lines.insert(idx + 1, indent + replacement_value)
+            else:
+                return None
+            return newline.join(lines)
+
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -101,6 +145,7 @@ def _mutant_record(filled_operator: dict, mutant_dir: str, *, applied: bool) -> 
         "field":             filled_operator.get("field", ""),
         "original_value":    filled_operator.get("original_value", ""),
         "replacement_value": filled_operator.get("replacement_value", ""),
+        "mode":              filled_operator.get("mode", "replace"),
         "scheme":            filled_operator.get("scheme", ""),
         "difficulty":        filled_operator.get("difficulty", 1),
         "applied":           applied,

@@ -1,0 +1,27 @@
+{
+  "id": "wrap_hash_removal",
+  "name": "Wrap checksum removal",
+  "description": "Delete the source_hash line from a .wrap file. Meson skips integrity verification when source_hash is absent, so a substituted archive is accepted without being flagged.",
+  "target_build_phase": "dependency_fetch",
+  "scheme": "dependency_aware",
+  "mode": "delete_line",
+  "injection_location": {
+    "file_glob": "subprojects/*.wrap",
+    "field": "source_hash"
+  },
+  "placeholders": {
+    "WRAP_FILE": "relative path to the .wrap file being modified",
+    "ORIGINAL_HASH": "the current source_hash value to delete"
+  },
+  "attacker_values": {},
+  "template": {
+    "file_path": "{{WRAP_FILE}}",
+    "replacement_value": ""
+  },
+  "preconditions": [
+    "project has at least one [wrap-file] subproject with a source_hash field"
+  ],
+  "source_attacks": [
+    "XZ Utils (CVE-2024-3094)"
+  ]
+}

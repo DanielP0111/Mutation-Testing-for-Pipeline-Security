@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MutationOperatorSchema",
+  "type": "object",
+  "description": "Schema v2 for mutation operator records. Extends the original proposal schema with the fields the generation engine consumes (name, scheme, mode, placeholders, attacker_values, template) and structures injection_location. Operators may be authored as JSON or YAML.",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique snake_case identifier for the operator."
+    },
+    "name": {
+      "type": "string",
+      "description": "Short human-readable name."
+    },
+    "description": {
+      "type": "string",
+      "description": "Plain-English explanation of the abstract attack pattern."
+    },
+    "target_build_phase": {
+      "type": "string",
+      "description": "Which build phase the operator applies to.",
+      "enum": ["dependency_fetch", "configure", "compile", "test", "package_release"]
+    },
+    "scheme": {
+      "type": "string",
+      "description": "Placement strategy that locates where this operator can be injected.",
+      "enum": ["dependency_aware", "config_aware", "adversarial", "all"]
+    },
+    "mode": {
+      "type": "string",
+      "description": "How the single-field change is applied by the engine.",
+      "enum": ["replace", "delete_line", "insert_after"],
+      "default": "replace"
+    },
+    "injection_location": {
+      "type": "object",
+      "description": "Where in a target project the change occurs.",
+      "properties": {
+        "file_glob": {
+          "type": "string",
+          "description": "Glob (relative to project root) matching candidate files, e.g. 'subprojects/*.wrap'."
+        },
+        "field": {
+          "type": "string",
+          "description": "Name of the field/line the operator targets, e.g. 'source_url'."
+        }
+      },
+      "required": ["file_glob", "field"],
+      "additionalProperties": false
+    },
+    "placeholders": {
+      "type": "object",
+      "description": "Map of {{PLACEHOLDER}} name -> description for values resolved from the target project by the placement step.",
+      "additionalProperties": { "type": "string" }
+    },
+    "attacker_values": {
+      "type": "object",
+      "description": "Map of {{PLACEHOLDER}} name -> concrete value supplied by the operator (the attacker), which the target project cannot provide.",
+      "additionalProperties": { "type": "string" }
+    },
+    "template": {
+      "type": "object",
+      "description": "The change to apply. May contain {{PLACEHOLDER}} tokens resolved from placeholders and attacker_values.",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "Target file, usually '{{WRAP_FILE}}' or another resolved path."
+        },
+        "replacement_value": {
+          "type": "string",
+          "description": "Value substituted (replace), inserted (insert_after), or ignored (delete_line)."
+        }
+      },
+      "required": ["file_path", "replacement_value"],
+      "additionalProperties": false
+    },
+    "preconditions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Requirements that must hold for the operator to produce a valid mutant."
+    },
+    "source_attacks": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Names of real attacks (from the taxonomy) this operator generalizes."
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "description",
+    "target_build_phase",
+    "scheme",
+    "mode",
+    "injection_location",
+    "template",
+    "preconditions"
+  ],
+  "additionalProperties": false
+}

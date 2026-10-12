@@ -48,6 +48,8 @@ def parse_project(project_dir: str) -> dict:
         "wrap_files": _find_wrap_files(root),
         "conditionals": _find_conditionals(root),
         "dependencies": _find_dependencies(root),
+        "build_calls": _find_build_calls(root),
+        "option_reads": _find_option_reads(root),
     }
 
 
@@ -174,3 +176,66 @@ def _find_dependencies(root: Path) -> list[dict]:
             )
 
     return dependencies
+
+
+# Build-time call hook points (David's hook map, rows 1/7): custom_target,
+# run_command, generator, and subproject calls are the parse-stage surfaces
+# where a command= argument or generated output can carry an injection.
+_BUILD_CALL_NAMES = ("custom_target", "run_command", "generator", "subproject")
+
+
+def _find_build_calls(root: Path) -> list[dict]:
+    """
+    Find custom_target(), run_command(), generator(), and subproject() calls
+    in every meson.build file under root.
+
+    Returns one entry per call:
+        {"file_path": str, "line": int, "call": str}
+    """
+    calls = []
+    call_re = re.compile(r"\b(" + "|".join(_BUILD_CALL_NAMES) + r")\s*\(")
+
+    for build_file in sorted(root.rglob("meson.build")):
+        rel_path = str(build_file.relative_to(root))
+        try:
+            text = build_file.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+
+        for m in call_re.finditer(text):
+            line = text[: m.start()].count("\n") + 1
+            calls.append(
+                {"file_path": rel_path, "line": line, "call": m.group(1)}
+            )
+
+    return calls
+
+
+def _find_option_reads(root: Path) -> list[dict]:
+    """
+    Find get_option('name') reads in every meson.build file under root.
+
+    These mark the configuration surface that config-aware placement gates on:
+    an injection inside a branch keyed off one of these options only executes
+    (and is only exercised by a defense tool) when that option is enabled.
+
+    Returns one entry per read:
+        {"file_path": str, "line": int, "option": str}
+    """
+    reads = []
+    opt_re = re.compile(r"""get_option\(\s*['"]([^'"]+)['"]\s*\)""")
+
+    for build_file in sorted(root.rglob("meson.build")):
+        rel_path = str(build_file.relative_to(root))
+        try:
+            text = build_file.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+
+        for m in opt_re.finditer(text):
+            line = text[: m.start()].count("\n") + 1
+            reads.append(
+                {"file_path": rel_path, "line": line, "option": m.group(1)}
+            )
+
+    return reads

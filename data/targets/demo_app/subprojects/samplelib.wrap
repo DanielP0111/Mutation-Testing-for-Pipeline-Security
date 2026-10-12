@@ -1,0 +1,5 @@
+[wrap-file]
+directory = samplelib-1.0
+source_url = https://downloads.example.org/samplelib/samplelib-1.0.tar.gz
+source_filename = samplelib-1.0.tar.gz
+source_hash = 0000000000000000000000000000000000000000000000000000000000000000
