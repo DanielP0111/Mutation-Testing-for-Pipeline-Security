@@ -1,0 +1,140 @@
+The Meson build system
+Version: 1.5.2
+Source dir: /src
+Build dir: /src/build
+Build type: native build
+Project name: git
+Project version: v2.47.GIT
+C compiler for the host machine: cc (gcc 12.2.0 "cc (Debian 12.2.0-14+deb12u1) 12.2.0")
+C linker for the host machine: cc ld.bfd 2.40
+Host machine cpu family: aarch64
+Host machine cpu: aarch64
+Program cygpath found: NO
+Program diff found: YES (/usr/bin/diff)
+Program sh found: YES (/usr/bin/sh)
+Program tar found: YES (/usr/bin/tar)
+Program cat found: YES (/usr/bin/cat)
+Program cut found: YES (/usr/bin/cut)
+Program grep found: YES (/usr/bin/grep)
+Program sed found: YES (/usr/bin/sed)
+Program sort found: YES (/usr/bin/sort)
+Program tr found: YES (/usr/bin/tr)
+Program uname found: YES (/usr/bin/uname)
+Program git found: YES (/usr/bin/git)
+Program python3 found: YES (/usr/bin/python3)
+Program perl found: YES 36 36 (/usr/bin/perl)
+Found pkg-config: YES (/usr/bin/pkg-config) 1.8.1
+Run-time dependency zlib found: YES 1.2.13
+Run-time dependency threads found: YES
+Program msgfmt found: YES (/usr/bin/msgfmt)
+Run-time dependency intl found: YES
+Checking for function "nl_langinfo" : YES 
+Run-time dependency iconv found: YES
+Checking if "old iconv interface" with dependency iconv compiles: YES 
+Checking if "iconv omits BOM" with dependency iconv runs: YES
+Run-time dependency libpcre2-8 found: YES 10.42
+Run-time dependency libcurl found: YES 7.88.1
+Run-time dependency expat found: YES 2.5.0
+Has header "sys/select.h" : YES 
+Has header "poll.h" : YES 
+Has header "sys/poll.h" : YES 
+Has header "inttypes.h" : YES 
+Has header "alloca.h" : YES 
+Has header "sys/sysinfo.h" : YES 
+Has header "libgen.h" : YES 
+Has header "paths.h" : YES 
+Has header "strings.h" : YES 
+Library resolv found: YES
+Checking for function "inet_ntop" with dependency -lresolv: YES 
+Checking for function "inet_pton" with dependency -lresolv: YES 
+Checking for function "strerror" with dependency -lresolv: YES 
+Checking for function "getaddrinfo" with dependency -lresolv: YES 
+Checking if "struct sockaddr_storage" compiles: YES 
+Checking for function "socket" with dependency -lresolv: YES 
+Checking for function "pread" : YES 
+Has header "regex.h" : YES 
+Fetching value of define "REG_STARTEND" : (1 << 2) 
+Fetching value of define "REG_ENHANCED" : (undefined) 
+Checking if "struct itimerval" compiles: YES 
+Checking for function "setitimer" : YES 
+Checking whether type "struct stat" has member "st_mtimespec.tv_nsec" : NO 
+Checking whether type "struct stat" has member "st_mtim.tv_nsec" : YES 
+Checking whether type "struct stat" has member "st_blocks" : YES 
+Checking whether type "struct dirent" has member "d_type" : YES 
+Checking whether type "struct passwd" has member "pw_gecos" : YES 
+Checking for function "sync_file_range" : YES 
+Checking for function "strcasestr" : YES 
+Checking for function "memmem" : YES 
+Checking for function "strlcpy" : NO 
+Checking for function "strdup" : YES 
+Checking for function "strtoumax" : YES 
+Checking for function "strtoull" : YES 
+Checking for function "setenv" : YES 
+Checking for function "qsort" : YES 
+Checking for function "unsetenv" : YES 
+Checking for function "mkdtemp" : YES 
+Checking for function "initgroups" : YES 
+Checking for function "getdelim" : YES 
+Checking for function "mmap" : YES 
+Checking for function "clock_gettime" : YES 
+Checking if "monotonic clock" compiles: YES 
+Checking if "uintmax_t" compiles: YES 
+Has header "sys/sysctl.h" : NO 
+Checking if "fread reads directories" runs: YES
+Did not find CMake 'cmake'
+Found CMake: NO
+Run-time dependency security found: NO (tried pkgconfig and cmake)
+Run-time dependency corefoundation found: NO (tried pkgconfig and cmake)
+Run-time dependency openssl found: NO (tried pkgconfig, system and cmake)
+Header "stdlib.h" has symbol "arc4random_buf" : YES 
+Configuring GIT-PERL-HEADER using configuration
+Program msgfmt found: YES (/usr/bin/msgfmt)
+Program msginit found: YES (/usr/bin/msginit)
+Program msgmerge found: YES (/usr/bin/msgmerge)
+Program xgettext found: YES (/usr/bin/xgettext)
+Configuring GITWEB-BUILD-OPTIONS using configuration
+Configuring description using configuration
+Configuring applypatch-msg.sample using configuration
+Configuring commit-msg.sample using configuration
+Configuring fsmonitor-watchman.sample using configuration
+Configuring post-update.sample using configuration
+Configuring pre-applypatch.sample using configuration
+Configuring pre-commit.sample using configuration
+Configuring pre-merge-commit.sample using configuration
+Configuring prepare-commit-msg.sample using configuration
+Configuring pre-push.sample using configuration
+Configuring pre-rebase.sample using configuration
+Configuring pre-receive.sample using configuration
+Configuring push-to-checkout.sample using configuration
+Configuring sendemail-validate.sample using configuration
+Configuring update.sample using configuration
+Configuring exclude using configuration
+Configuring git using configuration
+Configuring git-shell using configuration
+Configuring scalar using configuration
+Configuring git-receive-pack using configuration
+Configuring git-upload-archive using configuration
+Configuring git-upload-pack using configuration
+Configuring git-cvsserver using configuration
+Configuring test-tool using configuration
+Configuring test-fake-ssh using configuration
+Configuring GIT-BUILD-OPTIONS using configuration
+Build targets in project: 121
+
+git v2.47.GIT
+
+  Auto-detected features
+    curl     : true
+    expat    : true
+    gettext  : true
+    gitweb   : true
+    https    : auto
+    iconv    : true
+    pcre2    : true
+    perl     : true
+    python   : true
+
+  User defined options
+    buildtype: release
+
+Found ninja-1.11.1 at /usr/bin/ninja

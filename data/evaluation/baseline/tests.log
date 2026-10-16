@@ -1,0 +1,15 @@
+ninja: Entering directory `/src/build'
+[1/49] Generating GIT-VERSION-FILE with a custom command (wrapped by meson to set env)
+1/4 t-hash            OK              0.02s
+2/4 t1007-hash-object OK              0.12s
+3/4 t0001-init        OK              0.52s
+4/4 t0000-basic       OK              1.95s
+
+Ok:                 4   
+Expected Fail:      0   
+Fail:               0   
+Unexpected Pass:    0   
+Skipped:            0   
+Timeout:            0   
+
+Full log written to /src/build/meson-logs/testlog.txt

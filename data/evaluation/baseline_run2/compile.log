@@ -1,0 +1,705 @@
+ninja: Entering directory `/src/build'
+[1/702] Compiling C object git.p/builtin_annotate.c.o
+[2/702] Generating config-list.h with a custom command (wrapped by meson to set env)
+[3/702] Compiling C object libcommon-main.a.p/common-main.c.o
+[4/702] Linking static target libcommon-main.a
+[5/702] Generating hook-list.h with a custom command (wrapped by meson to set env)
+[6/702] Compiling C object git.p/builtin_apply.c.o
+[7/702] Compiling C object git.p/builtin_archive.c.o
+[8/702] Generating command-list.h with a custom command (wrapped by meson to set env)
+[9/702] Compiling C object git.p/builtin_bugreport.c.o
+[10/702] Compiling C object git.p/builtin_bundle.c.o
+[11/702] Compiling C object git.p/builtin_add.c.o
+[12/702] Compiling C object libgit.a.p/abspath.c.o
+[13/702] Compiling C object libgit.a.p/advice.c.o
+[14/702] Compiling C object libgit.a.p/alloc.c.o
+[15/702] Generating GIT-VERSION-FILE with a custom command (wrapped by meson to set env)
+[16/702] Compiling C object libgit.a.p/alias.c.o
+[17/702] Compiling C object git.p/builtin_bisect.c.o
+[18/702] Compiling C object git.p/builtin_blame.c.o
+[19/702] Compiling C object libgit.a.p/add-interactive.c.o
+[20/702] Compiling C object git.p/builtin_cat-file.c.o
+[21/702] Compiling C object git.p/builtin_branch.c.o
+[22/702] Compiling C object libgit.a.p/base85.c.o
+[23/702] Compiling C object git.p/builtin_am.c.o
+[24/702] Generating version-def.h with a custom command (wrapped by meson to set env)
+[25/702] Compiling C object libgit.a.p/archive-tar.c.o
+[26/702] Compiling C object libgit.a.p/archive.c.o
+[27/702] Compiling C object libgit.a.p/blob.c.o
+[28/702] Compiling C object libgit-version.a.p/version.c.o
+[29/702] Linking static target libgit-version.a
+[30/702] Compiling C object libgit.a.p/archive-zip.c.o
+[31/702] Compiling C object libgit.a.p/add-patch.c.o
+[32/702] Compiling C object libgit.a.p/attr.c.o
+[33/702] Compiling C object libgit.a.p/bloom.c.o
+[34/702] Compiling C object libgit.a.p/bulk-checkin.c.o
+[35/702] Compiling C object libgit.a.p/checkout.c.o
+[36/702] Compiling C object libgit.a.p/chdir-notify.c.o
+[37/702] Compiling C object libgit.a.p/bisect.c.o
+[38/702] Compiling C object libgit.a.p/branch.c.o
+[39/702] Compiling C object libgit.a.p/cbtree.c.o
+[40/702] Compiling C object libgit.a.p/chunk-format.c.o
+[41/702] Compiling C object libgit.a.p/column.c.o
+[42/702] Compiling C object libgit.a.p/bundle-uri.c.o
+[43/702] Compiling C object libgit.a.p/bundle.c.o
+[44/702] Compiling C object libgit.a.p/compat_obstack.c.o
+[45/702] Compiling C object libgit.a.p/compat_nonblock.c.o
+[46/702] Compiling C object libgit.a.p/color.c.o
+[47/702] Compiling C object libgit.a.p/cache-tree.c.o
+[48/702] Compiling C object libgit.a.p/blame.c.o
+[49/702] Compiling C object libgit.a.p/compat_zlib-uncompress2.c.o
+[50/702] Compiling C object libgit.a.p/compat_terminal.c.o
+[51/702] Compiling C object libgit.a.p/connected.c.o
+[52/702] Compiling C object libgit.a.p/commit-reach.c.o
+[53/702] Compiling C object libgit.a.p/copy.c.o
+[54/702] Compiling C object libgit.a.p/ctype.c.o
+[55/702] Compiling C object libgit.a.p/csum-file.c.o
+[56/702] Compiling C object libgit.a.p/credential.c.o
+[57/702] Compiling C object libgit.a.p/decorate.c.o
+[58/702] Compiling C object libgit.a.p/connect.c.o
+[59/702] Compiling C object libgit.a.p/commit.c.o
+[60/702] Compiling C object libgit.a.p/diagnose.c.o
+[61/702] Compiling C object libgit.a.p/diff-merges.c.o
+[62/702] Compiling C object libgit.a.p/combine-diff.c.o
+[63/702] Compiling C object libgit.a.p/diff-delta.c.o
+[64/702] Compiling C object libgit.a.p/diff-no-index.c.o
+[65/702] Compiling C object libgit.a.p/convert.c.o
+[66/702] Compiling C object libgit.a.p/commit-graph.c.o
+[67/702] Compiling C object libgit.a.p/diffcore-break.c.o
+[68/702] Compiling C object libgit.a.p/diff-lib.c.o
+[69/702] Compiling C object libgit.a.p/diffcore-order.c.o
+[70/702] Compiling C object libgit.a.p/diffcore-delta.c.o
+[71/702] Compiling C object libgit.a.p/diffcore-rotate.c.o
+[72/702] Compiling C object libgit.a.p/dir-iterator.c.o
+[73/702] Compiling C object libgit.a.p/config.c.o
+[74/702] Compiling C object libgit.a.p/diffcore-pickaxe.c.o
+[75/702] Compiling C object libgit.a.p/editor.c.o
+[76/702] Compiling C object libgit.a.p/date.c.o
+[77/702] Compiling C object libgit.a.p/delta-islands.c.o
+[78/702] Compiling C object libgit.a.p/ewah_bitmap.c.o
+[79/702] Compiling C object libgit.a.p/ewah_ewah_rlw.c.o
+[80/702] Compiling C object libgit.a.p/environment.c.o
+[81/702] Compiling C object libgit.a.p/ewah_ewah_io.c.o
+[82/702] Compiling C object libgit.a.p/exec-cmd.c.o
+[83/702] Compiling C object libgit.a.p/fetch-negotiator.c.o
+[84/702] Compiling C object libgit.a.p/ewah_ewah_bitmap.c.o
+[85/702] Compiling C object libgit.a.p/diffcore-rename.c.o
+[86/702] Compiling C object libgit.a.p/entry.c.o
+[87/702] Compiling C object libgit.a.p/apply.c.o
+[88/702] Compiling C object libgit.a.p/fsmonitor-ipc.c.o
+[89/702] Compiling C object libgit.a.p/gettext.c.o
+[90/702] Compiling C object libgit.a.p/fsmonitor-settings.c.o
+[91/702] Compiling C object libgit.a.p/fsmonitor.c.o
+[92/702] Compiling C object libgit.a.p/fmt-merge-msg.c.o
+[93/702] Compiling C object libgit.a.p/git-zlib.c.o
+[94/702] Compiling C object libgit.a.p/hash-lookup.c.o
+[95/702] Compiling C object libgit.a.p/hashmap.c.o
+[96/702] Compiling C object libgit.a.p/gpg-interface.c.o
+[97/702] Compiling C object libgit.a.p/graph.c.o
+[98/702] Compiling C object libgit.a.p/hex-ll.c.o
+[99/702] Compiling C object libgit.a.p/hex.c.o
+[100/702] Compiling C object libgit.a.p/fsck.c.o
+[101/702] Compiling C object libgit.a.p/hook.c.o
+[102/702] Compiling C object libgit.a.p/levenshtein.c.o
+[103/702] Compiling C object libgit.a.p/help.c.o
+[104/702] Compiling C object libgit.a.p/ident.c.o
+[105/702] Compiling C object libgit.a.p/fetch-pack.c.o
+[106/702] Compiling C object libgit.a.p/json-writer.c.o
+[107/702] Compiling C object libgit.a.p/list-objects-filter-options.c.o
+[108/702] Compiling C object libgit.a.p/dir.c.o
+[109/702] Compiling C object libgit.a.p/grep.c.o
+[110/702] Compiling C object libgit.a.p/line-range.c.o
+[111/702] Compiling C object libgit.a.p/linear-assignment.c.o
+[112/702] Compiling C object libgit.a.p/list-objects.c.o
+[113/702] Compiling C object libgit.a.p/lockfile.c.o
+[114/702] Compiling C object libgit.a.p/list-objects-filter.c.o
+[115/702] Compiling C object libgit.a.p/line-log.c.o
+[116/702] Compiling C object libgit.a.p/ls-refs.c.o
+[117/702] Compiling C object libgit.a.p/mailmap.c.o
+[118/702] Compiling C object libgit.a.p/match-trees.c.o
+[119/702] Compiling C object libgit.a.p/merge-ort-wrappers.c.o
+[120/702] Compiling C object libgit.a.p/mem-pool.c.o
+[121/702] Compiling C object libgit.a.p/loose.c.o
+[122/702] Compiling C object libgit.a.p/merge-blobs.c.o
+[123/702] Compiling C object libgit.a.p/merge-ll.c.o
+[124/702] Compiling C object libgit.a.p/merge.c.o
+[125/702] Compiling C object libgit.a.p/log-tree.c.o
+[126/702] Compiling C object libgit.a.p/negotiator_default.c.o
+[127/702] Compiling C object libgit.a.p/kwset.c.o
+[128/702] Compiling C object libgit.a.p/negotiator_noop.c.o
+[129/702] Compiling C object libgit.a.p/name-hash.c.o
+[130/702] Compiling C object libgit.a.p/negotiator_skipping.c.o
+[131/702] Compiling C object libgit.a.p/mailinfo.c.o
+[132/702] Compiling C object libgit.a.p/notes-cache.c.o
+[133/702] Compiling C object libgit.a.p/midx.c.o
+[134/702] Compiling C object libgit.a.p/notes-utils.c.o
+[135/702] Compiling C object libgit.a.p/object-file-convert.c.o
+[136/702] Compiling C object libgit.a.p/notes-merge.c.o
+[137/702] Compiling C object libgit.a.p/object.c.o
+[138/702] Compiling C object libgit.a.p/oidmap.c.o
+[139/702] Compiling C object libgit.a.p/midx-write.c.o
+[140/702] Compiling C object libgit.a.p/oid-array.c.o
+[141/702] Compiling C object libgit.a.p/oidtree.c.o
+[142/702] Compiling C object libgit.a.p/oidset.c.o
+[143/702] Compiling C object libgit.a.p/notes.c.o
+[144/702] Compiling C object libgit.a.p/pack-mtimes.c.o
+[145/702] Compiling C object libgit.a.p/merge-recursive.c.o
+[146/702] Compiling C object libgit.a.p/pack-check.c.o
+[147/702] Compiling C object libgit.a.p/pack-objects.c.o
+[148/702] Compiling C object libgit.a.p/pager.c.o
+[149/702] Compiling C object libgit.a.p/merge-ort.c.o
+[150/702] Compiling C object libgit.a.p/diff.c.o
+[151/702] Compiling C object libgit.a.p/pack-revindex.c.o
+[152/702] Compiling C object libgit.a.p/pack-write.c.o
+[153/702] Compiling C object libgit.a.p/pack-bitmap-write.c.o
+[154/702] Compiling C object libgit.a.p/object-file.c.o
+[155/702] Compiling C object libgit.a.p/parse.c.o
+[156/702] Compiling C object libgit.a.p/patch-delta.c.o
+[157/702] Compiling C object libgit.a.p/parallel-checkout.c.o
+[158/702] Compiling C object libgit.a.p/object-name.c.o
+[159/702] Compiling C object libgit.a.p/patch-ids.c.o
+[160/702] Compiling C object libgit.a.p/parse-options-cb.c.o
+[161/702] Compiling C object libgit.a.p/preload-index.c.o
+[162/702] Compiling C object libgit.a.p/prio-queue.c.o
+[163/702] Compiling C object libgit.a.p/pathspec.c.o
+[164/702] Compiling C object libgit.a.p/prompt.c.o
+[165/702] Compiling C object libgit.a.p/promisor-remote.c.o
+[166/702] Compiling C object libgit.a.p/protocol.c.o
+[167/702] Compiling C object libgit.a.p/parse-options.c.o
+[168/702] Compiling C object libgit.a.p/progress.c.o
+[169/702] Compiling C object libgit.a.p/pkt-line.c.o
+[170/702] Compiling C object libgit.a.p/protocol-caps.c.o
+[171/702] Compiling C object libgit.a.p/prune-packed.c.o
+[172/702] Compiling C object libgit.a.p/pack-bitmap.c.o
+[173/702] Compiling C object libgit.a.p/packfile.c.o
+[174/702] Compiling C object libgit.a.p/rebase.c.o
+[175/702] Compiling C object libgit.a.p/path.c.o
+[176/702] Compiling C object libgit.a.p/quote.c.o
+[177/702] Compiling C object libgit.a.p/reachable.c.o
+[178/702] Compiling C object libgit.a.p/rebase-interactive.c.o
+[179/702] Compiling C object libgit.a.p/pseudo-merge.c.o
+[180/702] Compiling C object libgit.a.p/range-diff.c.o
+[181/702] Compiling C object libgit.a.p/reflog.c.o
+[182/702] Compiling C object libgit.a.p/reflog-walk.c.o
+[183/702] Compiling C object libgit.a.p/refs_debug.c.o
+[184/702] Compiling C object libgit.a.p/refs_iterator.c.o
+[185/702] Compiling C object libgit.a.p/pretty.c.o
+[186/702] Compiling C object libgit.a.p/refspec.c.o
+[187/702] Compiling C object libgit.a.p/refs_ref-cache.c.o
+[188/702] Compiling C object libgit.a.p/reftable_error.c.o
+[189/702] Compiling C object libgit.a.p/reftable_basics.c.o
+[190/702] Compiling C object libgit.a.p/reftable_blocksource.c.o
+[191/702] Compiling C object libgit.a.p/reftable_block.c.o
+[192/702] Compiling C object libgit.a.p/reftable_merged.c.o
+[193/702] Compiling C object libgit.a.p/reftable_pq.c.o
+[194/702] Compiling C object libgit.a.p/reftable_iter.c.o
+[195/702] Compiling C object libgit.a.p/reftable_reader.c.o
+[196/702] Compiling C object libgit.a.p/reftable_system.c.o
+[197/702] Compiling C object libgit.a.p/refs_packed-backend.c.o
+[198/702] Compiling C object libgit.a.p/refs_files-backend.c.o
+[199/702] Compiling C object libgit.a.p/reftable_tree.c.o
+[200/702] Compiling C object libgit.a.p/refs.c.o
+[201/702] Compiling C object libgit.a.p/reftable_record.c.o
+[202/702] Compiling C object libgit.a.p/refs_reftable-backend.c.o
+[203/702] Compiling C object libgit.a.p/replace-object.c.o
+[204/702] Compiling C object libgit.a.p/repo-settings.c.o
+[205/702] Compiling C object libgit.a.p/repository.c.o
+[206/702] Compiling C object libgit.a.p/ref-filter.c.o
+[207/702] Compiling C object libgit.a.p/reftable_writer.c.o
+[208/702] Compiling C object libgit.a.p/reftable_stack.c.o
+[209/702] Compiling C object libgit.a.p/resolve-undo.c.o
+[210/702] Compiling C object libgit.a.p/reset.c.o
+[211/702] Compiling C object libgit.a.p/read-cache.c.o
+[212/702] Compiling C object libgit.a.p/serve.c.o
+[213/702] Compiling C object libgit.a.p/server-info.c.o
+[214/702] Compiling C object libgit.a.p/send-pack.c.o
+[215/702] Compiling C object libgit.a.p/sideband.c.o
+[216/702] Compiling C object libgit.a.p/sigchain.c.o
+[217/702] Compiling C object libgit.a.p/run-command.c.o
+[218/702] Compiling C object libgit.a.p/rerere.c.o
+[219/702] Compiling C object libgit.a.p/stable-qsort.c.o
+[220/702] Compiling C object libgit.a.p/statinfo.c.o
+[221/702] Compiling C object libgit.a.p/sparse-index.c.o
+[222/702] Compiling C object libgit.a.p/shallow.c.o
+[223/702] Compiling C object libgit.a.p/remote.c.o
+[224/702] Compiling C object libgit.a.p/split-index.c.o
+[225/702] Compiling C object libgit.a.p/streaming.c.o
+[226/702] Compiling C object libgit.a.p/strmap.c.o
+[227/702] Compiling C object libgit.a.p/string-list.c.o
+[228/702] Compiling C object libgit.a.p/strvec.c.o
+[229/702] Compiling C object libgit.a.p/sub-process.c.o
+[230/702] Compiling C object libgit.a.p/tag.c.o
+[231/702] Compiling C object libgit.a.p/thread-utils.c.o
+[232/702] Compiling C object libgit.a.p/strbuf.c.o
+[233/702] Compiling C object libgit.a.p/tempfile.c.o
+[234/702] Compiling C object libgit.a.p/submodule-config.c.o
+[235/702] Compiling C object libgit.a.p/tmp-objdir.c.o
+[236/702] Compiling C object libgit.a.p/setup.c.o
+[237/702] Compiling C object libgit.a.p/trace2_tr2_cfg.c.o
+[238/702] Compiling C object libgit.a.p/trace.c.o
+[239/702] Compiling C object libgit.a.p/symlinks.c.o
+[240/702] Compiling C object libgit.a.p/trace2_tr2_cmd_name.c.o
+[241/702] Compiling C object libgit.a.p/trace2_tr2_ctr.c.o
+[242/702] Compiling C object libgit.a.p/trace2_tr2_sid.c.o
+[243/702] Compiling C object libgit.a.p/trace2_tr2_sysenv.c.o
+[244/702] Compiling C object libgit.a.p/trace2_tr2_tbuf.c.o
+[245/702] Compiling C object libgit.a.p/trace2_tr2_dst.c.o
+[246/702] Compiling C object libgit.a.p/trace2_tr2_tls.c.o
+[247/702] Compiling C object libgit.a.p/trace2.c.o
+[248/702] Compiling C object libgit.a.p/trace2_tr2_tgt_normal.c.o
+[249/702] Compiling C object libgit.a.p/trace2_tr2_tmr.c.o
+[250/702] Compiling C object libgit.a.p/trace2_tr2_tgt_perf.c.o
+[251/702] Compiling C object libgit.a.p/trace2_tr2_tgt_event.c.o
+[252/702] Compiling C object libgit.a.p/submodule.c.o
+[253/702] Compiling C object libgit.a.p/tree.c.o
+[254/702] Compiling C object libgit.a.p/url.c.o
+[255/702] Compiling C object libgit.a.p/tree-diff.c.o
+[256/702] Compiling C object libgit.a.p/tree-walk.c.o
+[257/702] Compiling C object libgit.a.p/trailer.c.o
+[258/702] Compiling C object libgit.a.p/transport-helper.c.o
+[259/702] Compiling C object libgit.a.p/urlmatch.c.o
+[260/702] Compiling C object libgit.a.p/userdiff.c.o
+[261/702] Compiling C object libgit.a.p/usage.c.o
+[262/702] Compiling C object libgit.a.p/varint.c.o
+[263/702] Compiling C object libgit.a.p/versioncmp.c.o
+[264/702] Compiling C object libgit.a.p/transport.c.o
+[265/702] Compiling C object libgit.a.p/revision.c.o
+[266/702] Compiling C object libgit.a.p/walker.c.o
+[267/702] Compiling C object libgit.a.p/upload-pack.c.o
+[268/702] Compiling C object libgit.a.p/wildmatch.c.o
+[269/702] Compiling C object libgit.a.p/write-or-die.c.o
+[270/702] Compiling C object libgit.a.p/utf8.c.o
+[271/702] Compiling C object libgit.a.p/wrapper.c.o
+[272/702] Compiling C object libgit.a.p/xdiff-interface.c.o
+[273/702] Compiling C object libgit.a.p/xdiff_xemit.c.o
+[274/702] Compiling C object libgit.a.p/ws.c.o
+[275/702] Compiling C object libgit.a.p/xdiff_xhistogram.c.o
+[276/702] Compiling C object libgit.a.p/worktree.c.o
+[277/702] Compiling C object libgit.a.p/xdiff_xpatience.c.o
+[278/702] Compiling C object libgit.a.p/unix-socket.c.o
+[279/702] Compiling C object libgit.a.p/unix-stream-server.c.o
+[280/702] Compiling C object libgit.a.p/xdiff_xdiffi.c.o
+[281/702] Compiling C object libgit.a.p/xdiff_xprepare.c.o
+[282/702] Compiling C object libgit.a.p/compat_linux_procinfo.c.o
+[283/702] Compiling C object libgit.a.p/compat_simple-ipc_ipc-shared.c.o
+[284/702] Compiling C object libgit.a.p/compat_strlcpy.c.o
+[285/702] Compiling C object libgit.a.p/xdiff_xutils.c.o
+[286/702] Compiling C object libgit.a.p/compat_qsort_s.c.o
+[287/702] Compiling C object libgit.a.p/xdiff_xmerge.c.o
+[288/702] Compiling C object libgit.a.p/compat_fopen.c.o
+[289/702] Compiling C object libgit.a.p/sha1dc_git.c.o
+[290/702] Compiling C object libgit.a.p/compat_simple-ipc_ipc-unix-socket.c.o
+[291/702] Compiling C object git.p/builtin_check-ignore.c.o
+[292/702] Compiling C object git.p/builtin_check-ref-format.c.o
+[293/702] Compiling C object libgit.a.p/unpack-trees.c.o
+[294/702] Compiling C object git.p/builtin_check-mailmap.c.o
+[295/702] Compiling C object git.p/builtin_check-attr.c.o
+[296/702] Compiling C object libgit.a.p/sha1dc_ubc_check.c.o
+[297/702] Compiling C object git.p/builtin_checkout--worker.c.o
+[298/702] Compiling C object libgit.a.p/sequencer.c.o
+[299/702] Compiling C object libgit.a.p/sha256_block_sha256.c.o
+[300/702] Compiling C object git.p/builtin_checkout-index.c.o
+[301/702] Compiling C object git.p/builtin_column.c.o
+[302/702] Compiling C object git.p/builtin_commit-graph.c.o
+[303/702] Compiling C object git.p/builtin_count-objects.c.o
+[304/702] Compiling C object libgit.a.p/sha1dc_sha1.c.o
+[305/702] Compiling C object git.p/builtin_commit-tree.c.o
+[306/702] Compiling C object git.p/builtin_clean.c.o
+[307/702] Compiling C object git.p/builtin_credential-cache--daemon.c.o
+[308/702] Compiling C object git.p/builtin_credential-cache.c.o
+[309/702] Compiling C object git.p/builtin_credential.c.o
+[310/702] Compiling C object git.p/builtin_credential-store.c.o
+[311/702] Compiling C object libgit.a.p/wt-status.c.o
+[312/702] Compiling C object git.p/builtin_diagnose.c.o
+[313/702] Linking static target libgit.a
+[314/702] Compiling C object git.p/builtin_clone.c.o
+[315/702] Compiling C object git.p/builtin_diff-index.c.o
+[316/702] Compiling C object git.p/builtin_diff-files.c.o
+[317/702] Compiling C object git.p/builtin_diff-tree.c.o
+[318/702] Compiling C object git.p/builtin_commit.c.o
+[319/702] Compiling C object git.p/builtin_diff.c.o
+[320/702] Compiling C object git.p/builtin_checkout.c.o
+[321/702] Compiling C object git.p/builtin_fmt-merge-msg.c.o
+[322/702] Compiling C object git.p/builtin_fetch-pack.c.o
+[323/702] Compiling C object git.p/builtin_describe.c.o
+[324/702] Compiling C object git.p/builtin_for-each-repo.c.o
+[325/702] Compiling C object git.p/builtin_difftool.c.o
+[326/702] Compiling C object git.p/builtin_for-each-ref.c.o
+[327/702] Compiling C object git.p/builtin_config.c.o
+[328/702] Compiling C object git.p/builtin_get-tar-commit-id.c.o
+[329/702] Compiling C object git.p/builtin_fsmonitor--daemon.c.o
+[330/702] Compiling C object git.p/builtin_fast-export.c.o
+[331/702] Compiling C object git.p/builtin_hook.c.o
+[332/702] Compiling C object git.p/builtin_hash-object.c.o
+[333/702] Compiling C object git.p/builtin_init-db.c.o
+[334/702] Compiling C object git.p/builtin_interpret-trailers.c.o
+[335/702] Compiling C object git.p/builtin_help.c.o
+[336/702] Compiling C object git.p/builtin_fsck.c.o
+[337/702] Compiling C object git.p/builtin_ls-remote.c.o
+[338/702] Compiling C object git.p/builtin_mailinfo.c.o
+[339/702] Compiling C object git.p/builtin_mailsplit.c.o
+[340/702] Compiling C object git.p/builtin_ls-tree.c.o
+[341/702] Compiling C object git.p/builtin_merge-base.c.o
+[342/702] Compiling C object git.p/builtin_merge-file.c.o
+[343/702] Compiling C object git.p/builtin_merge-ours.c.o
+[344/702] Compiling C object git.p/builtin_merge-index.c.o
+[345/702] Compiling C object git.p/builtin_grep.c.o
+[346/702] Compiling C object git.p/builtin_merge-recursive.c.o
+[347/702] Compiling C object git.p/builtin_mktag.c.o
+[348/702] Compiling C object git.p/builtin_merge-tree.c.o
+[349/702] Compiling C object git.p/builtin_mktree.c.o
+[350/702] Compiling C object git.p/builtin_index-pack.c.o
+[351/702] Compiling C object git.p/builtin_gc.c.o
+[352/702] Compiling C object git.p/builtin_ls-files.c.o
+[353/702] Compiling C object git.p/builtin_multi-pack-index.c.o
+[354/702] Compiling C object git.p/builtin_mv.c.o
+[355/702] Compiling C object git.p/builtin_pack-refs.c.o
+[356/702] Compiling C object git.p/builtin_prune-packed.c.o
+[357/702] Compiling C object git.p/builtin_fetch.c.o
+[358/702] Compiling C object git.p/builtin_patch-id.c.o
+[359/702] Compiling C object git.p/builtin_merge.c.o
+[360/702] Compiling C object git.p/builtin_notes.c.o
+[361/702] Compiling C object git.p/builtin_name-rev.c.o
+[362/702] Compiling C object git.p/builtin_prune.c.o
+[363/702] Compiling C object git.p/builtin_fast-import.c.o
+[364/702] Compiling C object git.p/builtin_range-diff.c.o
+[365/702] Compiling C object git.p/builtin_log.c.o
+[366/702] Compiling C object git.p/builtin_pull.c.o
+[367/702] Compiling C object git.p/builtin_reflog.c.o
+[368/702] Compiling C object git.p/builtin_refs.c.o
+[369/702] Compiling C object git.p/builtin_pack-redundant.c.o
+[370/702] Compiling C object git.p/builtin_read-tree.c.o
+[371/702] Compiling C object git.p/builtin_push.c.o
+[372/702] Compiling C object git.p/builtin_remote-fd.c.o
+[373/702] Compiling C object git.p/builtin_remote-ext.c.o
+[374/702] Compiling C object git.p/builtin_rerere.c.o
+[375/702] Compiling C object git.p/builtin_replace.c.o
+[376/702] Compiling C object git.p/builtin_replay.c.o
+[377/702] Compiling C object git.p/builtin_reset.c.o
+[378/702] Compiling C object git.p/builtin_rev-list.c.o
+[379/702] Compiling C object git.p/builtin_rm.c.o
+[380/702] Compiling C object git.p/builtin_receive-pack.c.o
+[381/702] Compiling C object git.p/builtin_send-pack.c.o
+[382/702] Compiling C object git.p/builtin_revert.c.o
+[383/702] Compiling C object git.p/builtin_rebase.c.o
+[384/702] Compiling C object git.p/builtin_show-index.c.o
+[385/702] Compiling C object git.p/builtin_shortlog.c.o
+[386/702] Compiling C object git.p/builtin_remote.c.o
+[387/702] Compiling C object git.p/builtin_stripspace.c.o
+[388/702] Compiling C object git.p/builtin_symbolic-ref.c.o
+[389/702] Compiling C object git.p/builtin_show-ref.c.o
+[390/702] Compiling C object git.p/builtin_unpack-file.c.o
+[391/702] Compiling C object git.p/builtin_rev-parse.c.o
+[392/702] Compiling C object git.p/builtin_sparse-checkout.c.o
+[393/702] Compiling C object git.p/builtin_repack.c.o
+[394/702] Compiling C object git.p/builtin_show-branch.c.o
+[395/702] Compiling C object git.p/builtin_update-server-info.c.o
+[396/702] Compiling C object git.p/builtin_upload-pack.c.o
+[397/702] Compiling C object git.p/builtin_upload-archive.c.o
+[398/702] Compiling C object git.p/builtin_unpack-objects.c.o
+[399/702] Compiling C object git.p/builtin_var.c.o
+[400/702] Compiling C object git.p/builtin_verify-commit.c.o
+[401/702] Compiling C object git.p/builtin_verify-pack.c.o
+[402/702] Compiling C object git.p/builtin_verify-tag.c.o
+[403/702] Compiling C object git.p/builtin_tag.c.o
+[404/702] Compiling C object git.p/builtin_stash.c.o
+[405/702] Compiling C object git.p/builtin_write-tree.c.o
+[406/702] Compiling C object git-shell.p/shell.c.o
+[407/702] Compiling C object git-sh-i18n--envsubst.p/sh-i18n--envsubst.c.o
+[408/702] Compiling C object git.p/builtin_update-ref.c.o
+[409/702] Compiling C object git.p/builtin_pack-objects.c.o
+[410/702] Linking target git-sh-i18n--envsubst
+[411/702] Linking target git-shell
+[412/702] Compiling C object git.p/builtin_update-index.c.o
+[413/702] Compiling C object git.p/git.c.o
+[414/702] Compiling C object git-http-backend.p/http-backend.c.o
+[415/702] Compiling C object git-daemon.p/daemon.c.o
+[416/702] Compiling C object git.p/builtin_worktree.c.o
+[417/702] Linking target git-daemon
+[418/702] Compiling C object git-http-fetch.p/http-walker.c.o
+[419/702] Linking target git-http-backend
+[420/702] Compiling C object git-http-fetch.p/http-fetch.c.o
+[421/702] Compiling C object scalar.p/scalar.c.o
+[422/702] Compiling C object git-remote-http.p/http-walker.c.o
+[423/702] Compiling C object git.p/builtin_submodule--helper.c.o
+[424/702] Linking target scalar
+[425/702] Compiling C object git-remote-http.p/remote-curl.c.o
+[426/702] Compiling C object git-http-push.p/http-walker.c.o
+[427/702] Compiling C object git-imap-send.p/http-walker.c.o
+[428/702] Linking target git
+[429/702] Linking target git-upload-archive
+[430/702] Generating git-difftool--helper with a custom command
+[431/702] Generating git-filter-branch with a custom command
+[432/702] Generating git-merge-octopus with a custom command
+[433/702] Generating git-merge-one-file with a custom command
+[434/702] Generating git-mergetool--lib with a custom command
+[435/702] Generating git-merge-resolve with a custom command
+[436/702] Compiling C object git-imap-send.p/imap-send.c.o
+[437/702] Generating git-quiltimport with a custom command
+[438/702] Generating git-mergetool with a custom command
+[439/702] Generating git-request-pull with a custom command
+[440/702] Generating git-sh-i18n with a custom command
+[441/702] Generating git-sh-setup with a custom command
+[442/702] Generating git-submodule with a custom command
+[443/702] Generating git-archimport with a custom command
+[444/702] Linking target git-receive-pack
+[445/702] Generating git-web--browse with a custom command
+[446/702] Generating git-instaweb with a custom command
+[447/702] Generating git-cvsexportcommit with a custom command
+[448/702] Generating git-send-email with a custom command
+[449/702] Generating git-cvsimport with a custom command
+[450/702] Generating git-cvsserver with a custom command
+[451/702] Linking target git-upload-pack
+[452/702] Generating git-svn with a custom command
+[453/702] Generating perl/Git/I18N.pm with a custom command
+[454/702] Generating perl/Git/IndexInfo.pm with a custom command
+[455/702] Generating perl/Git.pm with a custom command
+[456/702] Generating perl/Git/LoadCPAN.pm with a custom command
+[457/702] Generating perl/Git/Packet.pm with a custom command
+[458/702] Generating perl/Git/LoadCPAN/Error.pm with a custom command
+[459/702] Generating perl/Git/LoadCPAN/Mail/Address.pm with a custom command
+[460/702] Generating perl/Git/SVN.pm with a custom command
+[461/702] Generating perl/Git/SVN/Editor.pm with a custom command
+[462/702] Compiling C object git-remote-http.p/http.c.o
+[463/702] Generating perl/Git/SVN/Fetcher.pm with a custom command
+[464/702] Generating perl/Git/SVN/GlobSpec.pm with a custom command
+[465/702] Generating perl/Git/SVN/Log.pm with a custom command
+[466/702] Compiling C object git-http-push.p/http-push.c.o
+[467/702] Generating perl/Git/SVN/Migration.pm with a custom command
+[468/702] Generating perl/Git/SVN/Prompt.pm with a custom command
+[469/702] Generating perl/Git/SVN/Ra.pm with a custom command
+[470/702] Generating perl/Git/SVN/Utils.pm with a custom command
+[471/702] Generating perl/FromCPAN/Error.pm with a custom command
+[472/702] Generating perl/Git/SVN/Memoize/YAML.pm with a custom command
+[473/702] Generating perl/FromCPAN/Mail/Address.pm with a custom command
+[474/702] Generating git-p4 with a custom command
+[475/702] Building translation po/bg/LC_MESSAGES/git-bg.mo
+[476/702] Linking target git-remote-ftp
+[477/702] Linking target git-remote-https
+[478/702] Linking target git-remote-ftps
+[479/702] Building translation po/ca/LC_MESSAGES/git-ca.mo
+[480/702] Building translation po/de/LC_MESSAGES/git-de.mo
+[481/702] Building translation po/el/LC_MESSAGES/git-el.mo
+[482/702] Building translation po/is/LC_MESSAGES/git-is.mo
+[483/702] Linking target git-remote-http
+[484/702] Building translation po/fr/LC_MESSAGES/git-fr.mo
+[485/702] Building translation po/es/LC_MESSAGES/git-es.mo
+[486/702] Building translation po/it/LC_MESSAGES/git-it.mo
+[487/702] Building translation po/id/LC_MESSAGES/git-id.mo
+[488/702] Building translation po/ko/LC_MESSAGES/git-ko.mo
+[489/702] Compiling C object git-http-push.p/http.c.o
+[490/702] Building translation po/pl/LC_MESSAGES/git-pl.mo
+[491/702] Building translation po/pt_PT/LC_MESSAGES/git-pt_PT.mo
+[492/702] Building translation po/ru/LC_MESSAGES/git-ru.mo
+[493/702] Building translation po/tr/LC_MESSAGES/git-tr.mo
+[494/702] Building translation po/sv/LC_MESSAGES/git-sv.mo
+[495/702] Building translation po/uk/LC_MESSAGES/git-uk.mo
+[496/702] Compiling C object git-http-fetch.p/http.c.o
+[497/702] Building translation po/zh_CN/LC_MESSAGES/git-zh_CN.mo
+[498/702] Copying file contrib/completion/git-completion.tcsh
+[499/702] Generating gitweb/gitweb.js with a custom command
+[500/702] Copying file contrib/completion/git-completion.bash
+[501/702] Building translation po/vi/LC_MESSAGES/git-vi.mo
+[502/702] Building translation po/zh_TW/LC_MESSAGES/git-zh_TW.mo
+[503/702] Generating gitweb/gitweb.cgi with a custom command
+[504/702] Copying file gitweb/git-favicon.png
+[505/702] Copying file contrib/completion/git-prompt.sh
+[506/702] Copying file contrib/completion/git-completion.zsh
+[507/702] Copying file gitweb/gitweb.css
+[508/702] Linking target git-http-push
+[509/702] Copying file gitweb/git-logo.png
+[510/702] Generating t/clar-decls.h with a custom command (wrapped by meson to set env)
+[511/702] Linking target git-http-fetch
+[512/702] Compiling C object t/t-example-decorate.p/unit-tests_lib-oid.c.o
+[513/702] Compiling C object t/t-example-decorate.p/unit-tests_t-example-decorate.c.o
+[514/702] Compiling C object t/t-hash.p/unit-tests_lib-oid.c.o
+[515/702] Compiling C object t/t-example-decorate.p/unit-tests_lib-reftable.c.o
+[516/702] Compiling C object git-imap-send.p/http.c.o
+[517/702] Compiling C object t/t-example-decorate.p/unit-tests_test-lib.c.o
+[518/702] Generating t/clar.suite with a custom command (wrapped by meson to set env)
+[519/702] Compiling C object t/t-hash.p/unit-tests_t-hash.c.o
+[520/702] Compiling C object t/t-hash.p/unit-tests_lib-reftable.c.o
+[521/702] Compiling C object t/t-hashmap.p/unit-tests_lib-oid.c.o
+[522/702] Compiling C object t/t-hashmap.p/unit-tests_lib-reftable.c.o
+[523/702] Compiling C object t/t-hash.p/unit-tests_test-lib.c.o
+[524/702] Linking target t/t-example-decorate
+[525/702] Compiling C object t/unit-tests.p/unit-tests_unit-test.c.o
+[526/702] Linking target git-imap-send
+[527/702] Linking target t/t-hash
+[528/702] Compiling C object t/t-hashmap.p/unit-tests_test-lib.c.o
+[529/702] Compiling C object t/t-mem-pool.p/unit-tests_lib-reftable.c.o
+[530/702] Compiling C object t/t-mem-pool.p/unit-tests_t-mem-pool.c.o
+[531/702] Compiling C object t/unit-tests.p/unit-tests_u-ctype.c.o
+[532/702] Compiling C object t/t-mem-pool.p/unit-tests_lib-oid.c.o
+[533/702] Compiling C object t/t-mem-pool.p/unit-tests_test-lib.c.o
+[534/702] Compiling C object t/t-oid-array.p/unit-tests_lib-oid.c.o
+[535/702] Compiling C object t/t-hashmap.p/unit-tests_t-hashmap.c.o
+[536/702] Compiling C object t/t-oid-array.p/unit-tests_lib-reftable.c.o
+[537/702] Linking target t/t-mem-pool
+[538/702] Linking target t/t-hashmap
+[539/702] Compiling C object t/t-oid-array.p/unit-tests_test-lib.c.o
+[540/702] Compiling C object t/t-oidmap.p/unit-tests_lib-oid.c.o
+[541/702] Compiling C object t/unit-tests.p/unit-tests_u-strvec.c.o
+[542/702] Compiling C object t/t-oidmap.p/unit-tests_lib-reftable.c.o
+[543/702] Compiling C object t/t-oid-array.p/unit-tests_t-oid-array.c.o
+[544/702] Compiling C object t/t-oidtree.p/unit-tests_lib-oid.c.o
+[545/702] Compiling C object t/t-oidmap.p/unit-tests_test-lib.c.o
+[546/702] Compiling C object t/t-prio-queue.p/unit-tests_lib-oid.c.o
+[547/702] Compiling C object t/t-oidtree.p/unit-tests_t-oidtree.c.o
+[548/702] Compiling C object t/t-oidmap.p/unit-tests_t-oidmap.c.o
+[549/702] Compiling C object t/t-oidtree.p/unit-tests_lib-reftable.c.o
+[550/702] Linking target t/t-oid-array
+[551/702] Compiling C object t/unit-tests.p/unit-tests_clar_clar.c.o
+[552/702] Compiling C object t/t-prio-queue.p/unit-tests_lib-reftable.c.o
+[553/702] Compiling C object t/t-oidtree.p/unit-tests_test-lib.c.o
+[554/702] Compiling C object t/t-reftable-basics.p/unit-tests_lib-oid.c.o
+[555/702] Compiling C object t/t-prio-queue.p/unit-tests_t-prio-queue.c.o
+[556/702] Compiling C object t/t-prio-queue.p/unit-tests_test-lib.c.o
+[557/702] Compiling C object t/t-reftable-basics.p/unit-tests_lib-reftable.c.o
+[558/702] Linking target t/unit-tests
+[559/702] Compiling C object t/t-reftable-block.p/unit-tests_lib-oid.c.o
+[560/702] Linking target t/t-oidmap
+[561/702] Linking target t/t-oidtree
+[562/702] Compiling C object t/t-reftable-block.p/unit-tests_test-lib.c.o
+[563/702] Compiling C object t/t-reftable-basics.p/unit-tests_t-reftable-basics.c.o
+[564/702] Compiling C object t/t-reftable-merged.p/unit-tests_lib-oid.c.o
+[565/702] Compiling C object t/t-reftable-block.p/unit-tests_lib-reftable.c.o
+[566/702] Linking target t/t-prio-queue
+[567/702] Compiling C object t/t-reftable-basics.p/unit-tests_test-lib.c.o
+[568/702] Compiling C object t/t-reftable-merged.p/unit-tests_lib-reftable.c.o
+[569/702] Compiling C object t/t-reftable-block.p/unit-tests_t-reftable-block.c.o
+[570/702] Compiling C object t/t-reftable-pq.p/unit-tests_lib-oid.c.o
+[571/702] Compiling C object t/t-reftable-pq.p/unit-tests_lib-reftable.c.o
+[572/702] Compiling C object t/t-reftable-merged.p/unit-tests_test-lib.c.o
+[573/702] Compiling C object t/t-reftable-pq.p/unit-tests_t-reftable-pq.c.o
+[574/702] Compiling C object t/t-reftable-merged.p/unit-tests_t-reftable-merged.c.o
+[575/702] Compiling C object t/t-reftable-reader.p/unit-tests_lib-oid.c.o
+[576/702] Linking target t/t-reftable-basics
+[577/702] Linking target t/t-reftable-block
+[578/702] Compiling C object t/t-reftable-reader.p/unit-tests_lib-reftable.c.o
+[579/702] Compiling C object t/t-reftable-pq.p/unit-tests_test-lib.c.o
+[580/702] Compiling C object t/t-reftable-readwrite.p/unit-tests_lib-oid.c.o
+[581/702] Linking target t/t-reftable-merged
+[582/702] Compiling C object t/t-reftable-reader.p/unit-tests_t-reftable-reader.c.o
+[583/702] Compiling C object t/t-reftable-readwrite.p/unit-tests_lib-reftable.c.o
+[584/702] Compiling C object t/t-reftable-reader.p/unit-tests_test-lib.c.o
+[585/702] Compiling C object t/t-reftable-record.p/unit-tests_lib-oid.c.o
+[586/702] Linking target t/t-reftable-pq
+[587/702] Compiling C object t/t-reftable-record.p/unit-tests_lib-reftable.c.o
+[588/702] Compiling C object t/t-reftable-stack.p/unit-tests_lib-oid.c.o
+[589/702] Compiling C object t/t-reftable-readwrite.p/unit-tests_test-lib.c.o
+[590/702] Compiling C object t/t-reftable-stack.p/unit-tests_lib-reftable.c.o
+[591/702] Linking target t/t-reftable-reader
+[592/702] Compiling C object t/t-reftable-record.p/unit-tests_test-lib.c.o
+[593/702] Compiling C object t/t-reftable-stack.p/unit-tests_test-lib.c.o
+[594/702] Compiling C object t/t-reftable-record.p/unit-tests_t-reftable-record.c.o
+[595/702] Compiling C object t/t-reftable-tree.p/unit-tests_t-reftable-tree.c.o
+[596/702] Compiling C object t/t-reftable-tree.p/unit-tests_lib-oid.c.o
+[597/702] Compiling C object t/t-strbuf.p/unit-tests_lib-oid.c.o
+[598/702] Compiling C object t/t-reftable-tree.p/unit-tests_lib-reftable.c.o
+[599/702] Compiling C object t/t-strbuf.p/unit-tests_lib-reftable.c.o
+[600/702] Compiling C object t/t-reftable-tree.p/unit-tests_test-lib.c.o
+[601/702] Compiling C object t/t-reftable-readwrite.p/unit-tests_t-reftable-readwrite.c.o
+[602/702] Compiling C object t/t-strcmp-offset.p/unit-tests_lib-oid.c.o
+[603/702] Linking target t/t-reftable-record
+[604/702] Compiling C object t/t-strcmp-offset.p/unit-tests_lib-reftable.c.o
+[605/702] Compiling C object t/t-strcmp-offset.p/unit-tests_t-strcmp-offset.c.o
+[606/702] Linking target t/t-reftable-tree
+[607/702] Compiling C object t/t-strbuf.p/unit-tests_t-strbuf.c.o
+[608/702] Compiling C object t/t-trailer.p/unit-tests_lib-oid.c.o
+[609/702] Compiling C object t/t-strbuf.p/unit-tests_test-lib.c.o
+[610/702] Compiling C object t/t-trailer.p/unit-tests_lib-reftable.c.o
+[611/702] Linking target t/t-reftable-readwrite
+[612/702] Compiling C object t/t-trailer.p/unit-tests_t-trailer.c.o
+[613/702] Compiling C object t/t-urlmatch-normalization.p/unit-tests_lib-oid.c.o
+[614/702] Compiling C object t/t-strcmp-offset.p/unit-tests_test-lib.c.o
+[615/702] Compiling C object t/t-urlmatch-normalization.p/unit-tests_lib-reftable.c.o
+[616/702] Linking target t/t-strbuf
+[617/702] Compiling C object t/helper/test-tool.p/test-advise.c.o
+[618/702] Linking target t/t-strcmp-offset
+[619/702] Compiling C object t/t-trailer.p/unit-tests_test-lib.c.o
+[620/702] Compiling C object t/helper/test-tool.p/test-bloom.c.o
+[621/702] Compiling C object t/t-urlmatch-normalization.p/unit-tests_test-lib.c.o
+[622/702] Compiling C object t/helper/test-tool.p/test-bundle-uri.c.o
+[623/702] Compiling C object t/helper/test-tool.p/test-bitmap.c.o
+[624/702] Compiling C object t/helper/test-tool.p/test-chmtime.c.o
+[625/702] Compiling C object t/t-reftable-stack.p/unit-tests_t-reftable-stack.c.o
+[626/702] Compiling C object t/helper/test-tool.p/test-crontab.c.o
+[627/702] Compiling C object t/helper/test-tool.p/test-csprng.c.o
+[628/702] Compiling C object t/helper/test-tool.p/test-cache-tree.c.o
+[629/702] Linking target t/t-trailer
+[630/702] Compiling C object t/helper/test-tool.p/.._unit-tests_test-lib.c.o
+[631/702] Compiling C object t/helper/test-tool.p/test-date.c.o
+[632/702] Compiling C object t/helper/test-tool.p/test-delta.c.o
+[633/702] Compiling C object t/helper/test-tool.p/test-drop-caches.c.o
+[634/702] Compiling C object t/helper/test-tool.p/test-delete-gpgsig.c.o
+[635/702] Linking target t/t-reftable-stack
+[636/702] Compiling C object t/t-urlmatch-normalization.p/unit-tests_t-urlmatch-normalization.c.o
+[637/702] Compiling C object t/helper/test-tool.p/test-config.c.o
+[638/702] Compiling C object t/helper/test-tool.p/test-dir-iterator.c.o
+[639/702] Compiling C object t/helper/test-tool.p/test-dump-fsmonitor.c.o
+[640/702] Compiling C object t/helper/test-tool.p/test-dump-cache-tree.c.o
+[641/702] Compiling C object t/helper/test-tool.p/test-dump-split-index.c.o
+[642/702] Compiling C object t/helper/test-tool.p/test-find-pack.c.o
+[643/702] Compiling C object t/helper/test-tool.p/test-genrandom.c.o
+[644/702] Compiling C object t/helper/test-tool.p/test-env-helper.c.o
+[645/702] Compiling C object t/helper/test-tool.p/test-getcwd.c.o
+[646/702] Compiling C object t/helper/test-tool.p/test-fsmonitor-client.c.o
+[647/702] Compiling C object t/helper/test-tool.p/test-dump-untracked-cache.c.o
+[648/702] Compiling C object t/helper/test-tool.p/test-genzeros.c.o
+[649/702] Compiling C object t/helper/test-tool.p/test-hash.c.o
+[650/702] Compiling C object t/helper/test-tool.p/test-example-tap.c.o
+[651/702] Compiling C object t/helper/test-tool.p/test-hash-speed.c.o
+[652/702] Linking target t/t-urlmatch-normalization
+[653/702] Compiling C object t/helper/test-tool.p/test-hexdump.c.o
+[654/702] Compiling C object t/helper/test-tool.p/test-hashmap.c.o
+[655/702] Compiling C object t/helper/test-tool.p/test-mktemp.c.o
+[656/702] Compiling C object t/helper/test-tool.p/test-online-cpus.c.o
+[657/702] Compiling C object t/helper/test-tool.p/test-pack-mtimes.c.o
+[658/702] Compiling C object t/helper/test-tool.p/test-match-trees.c.o
+[659/702] Compiling C object t/helper/test-tool.p/test-lazy-init-name-hash.c.o
+[660/702] Compiling C object t/helper/test-tool.p/test-pcre2-config.c.o
+[661/702] Compiling C object t/helper/test-tool.p/test-parse-pathspec-file.c.o
+[662/702] Compiling C object t/helper/test-tool.p/test-partial-clone.c.o
+[663/702] Compiling C object t/helper/test-tool.p/test-json-writer.c.o
+[664/702] Compiling C object t/helper/test-tool.p/test-pkt-line.c.o
+[665/702] Compiling C object t/helper/test-tool.p/test-progress.c.o
+[666/702] Compiling C object t/helper/test-tool.p/test-proc-receive.c.o
+[667/702] Compiling C object t/helper/test-tool.p/test-read-graph.c.o
+[668/702] Compiling C object t/helper/test-tool.p/test-regex.c.o
+[669/702] Compiling C object t/helper/test-tool.p/test-parse-options.c.o
+[670/702] Compiling C object t/helper/test-tool.p/test-read-midx.c.o
+[671/702] Compiling C object t/helper/test-tool.p/test-path-utils.c.o
+[672/702] Compiling C object t/helper/test-tool.p/test-read-cache.c.o
+[673/702] Compiling C object t/helper/test-tool.p/test-reftable.c.o
+[674/702] Compiling C object t/helper/test-tool.p/test-scrap-cache-tree.c.o
+[675/702] Compiling C object t/helper/test-tool.p/test-reach.c.o
+[676/702] Compiling C object t/helper/test-tool.p/test-repository.c.o
+[677/702] Compiling C object t/helper/test-tool.p/test-revision-walking.c.o
+[678/702] Compiling C object t/helper/test-tool.p/test-ref-store.c.o
+[679/702] Compiling C object t/helper/test-tool.p/test-sha256.c.o
+[680/702] Compiling C object t/helper/test-tool.p/test-mergesort.c.o
+[681/702] Compiling C object t/helper/test-tool.p/test-serve-v2.c.o
+[682/702] Compiling C object t/helper/test-tool.p/test-sha1.c.o
+[683/702] Compiling C object t/helper/test-tool.p/test-sigchain.c.o
+[684/702] Compiling C object t/helper/test-tool.p/test-submodule-nested-repo-config.c.o
+[685/702] Compiling C object t/helper/test-tool.p/test-subprocess.c.o
+[686/702] Compiling C object t/helper/test-tool.p/test-string-list.c.o
+[687/702] Compiling C object t/helper/test-tool.p/test-rot13-filter.c.o
+[688/702] Compiling C object t/helper/test-tool.p/test-submodule-config.c.o
+[689/702] Compiling C object t/helper/test-tool.p/test-tool.c.o
+[690/702] Compiling C object t/helper/test-tool.p/test-submodule.c.o
+[691/702] Compiling C object t/helper/test-tool.p/test-truncate.c.o
+[692/702] Compiling C object t/helper/test-tool.p/test-wildmatch.c.o
+[693/702] Compiling C object t/helper/test-tool.p/test-windows-named-pipe.c.o
+[694/702] Compiling C object t/helper/test-tool.p/test-run-command.c.o
+[695/702] Compiling C object t/helper/test-tool.p/test-userdiff.c.o
+[696/702] Compiling C object t/helper/test-tool.p/test-write-cache.c.o
+[697/702] Compiling C object t/helper/test-tool.p/test-xml-encode.c.o
+[698/702] Compiling C object t/helper/test-fake-ssh.p/test-fake-ssh.c.o
+[699/702] Compiling C object t/helper/test-tool.p/test-simple-ipc.c.o
+[700/702] Compiling C object t/helper/test-tool.p/test-trace2.c.o
+[701/702] Linking target t/helper/test-fake-ssh
+[702/702] Linking target t/helper/test-tool
+INFO: autodetecting backend as ninja
+INFO: calculating backend command to run: /usr/bin/ninja -C /src/build

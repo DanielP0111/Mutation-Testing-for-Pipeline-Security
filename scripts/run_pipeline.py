@@ -5,7 +5,10 @@ scripts/run_pipeline.py
 End-to-end mutation pipeline driver:
 
     parse target  ->  find candidates  ->  fill template  ->  generate mutant
-    ->  (optional) validate with meson setup  ->  write mutant + metadata.json
+    ->  (optional) validate with meson setup
+    ->  (optional) build + test in the Docker harness and classify against the
+        clean baseline (setup_failed / setup_valid / build_valid / effective)
+    ->  write mutant + metadata.json
 
 Placement source:
   By default the driver calls src.placement.find_candidates (David's package).
@@ -19,6 +22,13 @@ Usage:
         --operators data/operators \
         --out data/benchmark \
         --validate --reference-placement
+
+    # Full oracle in the Docker harness (needs: docker build -t pipeline-harness harness/)
+    python scripts/run_pipeline.py \
+        --target data/targets/git \
+        --operators data/operators \
+        --out data/benchmark \
+        --harness --baseline data/evaluation/baseline --reference-placement
 """
 
 import argparse
@@ -32,7 +42,8 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from src.parser import parse_project
 from src.engine import load_operators, fill_template, generate_mutant
-from src.engine.validator import validate_mutant
+from src.engine.validator import validate_mutant, classify_runs
+from src.engine.harness_runner import run_in_harness, load_run, DEFAULT_TESTS
 from src.engine.reference_placement import reference_find_candidates
 from src.placement import find_candidates as placement_find_candidates
 
@@ -53,8 +64,20 @@ def _unified_diff(original_root: Path, mutant_rec: dict) -> str:
     )
 
 
+def _load_or_run_baseline(target_root: Path, baseline_dir: Path, tests, wrap_mode) -> dict:
+    """Reuse an existing baseline run if one is there; otherwise build it now."""
+    if (baseline_dir / "status.json").exists():
+        print(f"using existing baseline in {baseline_dir}")
+        return load_run(str(baseline_dir))
+    print(f"no baseline in {baseline_dir}; building clean target in the harness...")
+    return run_in_harness(str(target_root), str(baseline_dir),
+                          tests=tests, wrap_mode=wrap_mode)
+
+
 def run(target: str, operators_dir: str, out_dir: str,
-        validate: bool, use_reference: bool) -> list[dict]:
+        validate: bool, use_reference: bool,
+        harness: bool = False, baseline: str | None = None, runs: int = 3,
+        tests=DEFAULT_TESTS, wrap_mode: str | None = None) -> list[dict]:
     target_root = Path(target).resolve()
     parsed = parse_project(str(target_root))
     operators = load_operators(operators_dir)
@@ -64,6 +87,15 @@ def run(target: str, operators_dir: str, out_dir: str,
     target_name = target_root.name
     results = []
     counter = 0
+
+    baseline_run = None
+    if harness:
+        baseline_dir = Path(baseline) if baseline else out_root / "_baseline"
+        baseline_run = _load_or_run_baseline(target_root, baseline_dir.resolve(),
+                                             tests, wrap_mode)
+        if baseline_run.get("status", {}).get("compile_rc") != 0:
+            raise SystemExit(f"baseline in {baseline_dir} did not compile; "
+                             "fix the clean build before running mutants")
 
     for operator in operators:
         candidates = placement_find_candidates(parsed, operator)
@@ -83,6 +115,24 @@ def run(target: str, operators_dir: str, out_dir: str,
             else:
                 record["validation"] = {"status": "skipped", "setup_ok": False,
                                         "returncode": None, "log_tail": ""}
+
+            effect = operator.get("effect")
+            if harness and record["applied"]:
+                # Run outputs live outside the mutant dir so later runs
+                # don't copy earlier results into the build.
+                runs_root = out_root / "_runs" / mutant_name
+                mutant_runs = [
+                    run_in_harness(record["mutant_dir"], str(runs_root / f"run{i}"),
+                                   tests=tests, wrap_mode=wrap_mode)
+                    for i in range(1, runs + 1)
+                ]
+                record["validity"] = classify_runs(mutant_runs, baseline_run, effect)
+                if effect and effect.get("requires"):
+                    record["validity"]["note"] = (
+                        "operator requires " + ", ".join(effect["requires"]) +
+                        "; single-operator mutants may not reach effective")
+            elif harness:
+                record["validity"] = {"level": "not_generated", "flaky": False, "runs": []}
 
             # Provenance alongside the mutant.
             diff = _unified_diff(target_root, record)
@@ -105,20 +155,40 @@ def main() -> int:
     ap.add_argument("--validate", action="store_true", help="run meson setup on mutants")
     ap.add_argument("--reference-placement", action="store_true",
                     help="use the engine's built-in reference placement as a fallback")
+    ap.add_argument("--harness", action="store_true",
+                    help="build/test each mutant in the Docker harness and classify it")
+    ap.add_argument("--baseline", default=None,
+                    help="baseline run dir to reuse (built here if missing; "
+                         "default <out>/_baseline)")
+    ap.add_argument("--runs", type=int, default=3,
+                    help="harness runs per mutant (lowest level wins; default 3)")
+    ap.add_argument("--tests", default=" ".join(DEFAULT_TESTS),
+                    help="space-separated meson test names to run")
+    ap.add_argument("--wrap-mode", default=None,
+                    help="meson --wrap-mode, e.g. forcefallback for wrap operators")
     args = ap.parse_args()
 
     results = run(args.target, args.operators, args.out,
-                  args.validate, args.reference_placement)
+                  args.validate, args.reference_placement,
+                  harness=args.harness, baseline=args.baseline, runs=args.runs,
+                  tests=tuple(args.tests.split()), wrap_mode=args.wrap_mode)
 
     applied = sum(1 for r in results if r["applied"])
     valid = sum(1 for r in results
                 if r.get("validation", {}).get("setup_ok"))
     print(f"generated {len(results)} mutant(s): {applied} applied, "
           f"{valid} setup-valid")
+    if args.harness:
+        from collections import Counter
+        levels = Counter(r.get("validity", {}).get("level") for r in results)
+        flaky = sum(1 for r in results if r.get("validity", {}).get("flaky"))
+        print("validity levels: " + ", ".join(f"{k}={v}" for k, v in sorted(levels.items())) +
+              f" (flaky={flaky})")
     for r in results:
         v = r.get("validation", {}).get("status", "n/a")
+        lvl = r.get("validity", {}).get("level", "n/a")
         print(f"  - {Path(r['mutant_dir']).name}: applied={r['applied']} "
-              f"field={r['field']} mode={r['mode']} validation={v}")
+              f"field={r['field']} mode={r['mode']} validation={v} validity={lvl}")
     return 0
 
 

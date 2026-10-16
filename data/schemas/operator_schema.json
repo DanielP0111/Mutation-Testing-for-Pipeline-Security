@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "MutationOperatorSchema",
   "type": "object",
-  "description": "Schema v2 for mutation operator records. Extends the original proposal schema with the fields the generation engine consumes (name, scheme, mode, placeholders, attacker_values, template) and structures injection_location. Operators may be authored as JSON or YAML.",
+  "description": "Schema v3 for mutation operator records. Extends the original proposal schema with the fields the generation engine consumes (name, scheme, mode, placeholders, attacker_values, template) and structures injection_location. Operators may be authored as JSON or YAML. v3 adds the optional 'effect' block (observable, check, requires) used by the attack-effect oracle in src/engine/validator.py. DRAFT: to be agreed with Debora.",
   "properties": {
     "id": {
       "type": "string",
@@ -19,17 +19,32 @@
     "target_build_phase": {
       "type": "string",
       "description": "Which build phase the operator applies to.",
-      "enum": ["dependency_fetch", "configure", "compile", "test", "package_release"]
+      "enum": [
+        "dependency_fetch",
+        "configure",
+        "compile",
+        "test",
+        "package_release"
+      ]
     },
     "scheme": {
       "type": "string",
       "description": "Placement strategy that locates where this operator can be injected.",
-      "enum": ["dependency_aware", "config_aware", "adversarial", "all"]
+      "enum": [
+        "dependency_aware",
+        "config_aware",
+        "adversarial",
+        "all"
+      ]
     },
     "mode": {
       "type": "string",
       "description": "How the single-field change is applied by the engine.",
-      "enum": ["replace", "delete_line", "insert_after"],
+      "enum": [
+        "replace",
+        "delete_line",
+        "insert_after"
+      ],
       "default": "replace"
     },
     "injection_location": {
@@ -45,18 +60,25 @@
           "description": "Name of the field/line the operator targets, e.g. 'source_url'."
         }
       },
-      "required": ["file_glob", "field"],
+      "required": [
+        "file_glob",
+        "field"
+      ],
       "additionalProperties": false
     },
     "placeholders": {
       "type": "object",
       "description": "Map of {{PLACEHOLDER}} name -> description for values resolved from the target project by the placement step.",
-      "additionalProperties": { "type": "string" }
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "attacker_values": {
       "type": "object",
       "description": "Map of {{PLACEHOLDER}} name -> concrete value supplied by the operator (the attacker), which the target project cannot provide.",
-      "additionalProperties": { "type": "string" }
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "template": {
       "type": "object",
@@ -71,18 +93,83 @@
           "description": "Value substituted (replace), inserted (insert_after), or ignored (delete_line)."
         }
       },
-      "required": ["file_path", "replacement_value"],
+      "required": [
+        "file_path",
+        "replacement_value"
+      ],
       "additionalProperties": false
     },
     "preconditions": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Requirements that must hold for the operator to produce a valid mutant."
     },
     "source_attacks": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Names of real attacks (from the taxonomy) this operator generalizes."
+    },
+    "effect": {
+      "type": "object",
+      "description": "What the attack does when it works, and how the harness confirms it. A mutant counts as 'effective' only if this effect is observed with no defense running.",
+      "properties": {
+        "observable": {
+          "type": "string",
+          "enum": [
+            "file_write",
+            "network_fetch",
+            "env_exfil",
+            "artifact_diff",
+            "test_input_swap"
+          ],
+          "description": "Effect type. Each is checked against the clean baseline in one harness output: file_write -> markers.txt, network_fetch/env_exfil -> mock_server.log, artifact_diff/test_input_swap -> hashes.txt."
+        },
+        "check": {
+          "type": "object",
+          "description": "Optional narrowing of the default check for the observable.",
+          "properties": {
+            "marker": {
+              "type": "string",
+              "description": "Substring the PWNED_* marker path must contain (file_write)."
+            },
+            "request_path": {
+              "type": "string",
+              "description": "Substring the mock-server request line must contain (network_fetch, env_exfil)."
+            },
+            "contains": {
+              "type": "string",
+              "description": "Substring the request line must contain; env_exfil defaults to the harness canary secret."
+            },
+            "artifact": {
+              "type": "string",
+              "description": "Build output path as written in hashes.txt (e.g. 'build/git') whose hash must differ."
+            },
+            "tests_may_fail": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Meson test names the attack is expected to break; failures here do not block build_valid."
+            }
+          },
+          "additionalProperties": false
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Operator ids that must be applied first (e.g. wrap_source_url_swap requires wrap_hash_removal)."
+        }
+      },
+      "required": [
+        "observable"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [

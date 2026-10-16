@@ -22,6 +22,10 @@ import yaml
 _REQUIRED_TOP = ("id", "scheme", "template")
 _VALID_SCHEMES = ("dependency_aware", "config_aware", "adversarial", "all")
 _VALID_MODES = ("replace", "delete_line", "insert_after")
+_VALID_OBSERVABLES = ("file_write", "network_fetch", "env_exfil",
+                      "artifact_diff", "test_input_swap")
+_VALID_CHECK_KEYS = ("marker", "request_path", "contains", "artifact",
+                     "tests_may_fail")
 
 
 def load_operator(file_path: str) -> dict:
@@ -33,7 +37,9 @@ def load_operator(file_path: str) -> dict:
 
     Returns:
         The operator dict, with a guaranteed "mode" key (defaults to "replace")
-        and a guaranteed "attacker_values" dict (defaults to {}).
+        and a guaranteed "attacker_values" dict (defaults to {}). If the
+        operator has a schema-v3 "effect" block, it is validated and given
+        default "check" ({}) and "requires" ([]) keys.
 
     Raises:
         FileNotFoundError: if the file does not exist.
@@ -78,7 +84,34 @@ def load_operator(file_path: str) -> dict:
     if not isinstance(operator["attacker_values"], dict):
         raise ValueError(f"Operator {file_path} 'attacker_values' must be a mapping.")
 
+    if "effect" in operator:
+        _validate_effect(operator["effect"], file_path)
+
     return operator
+
+
+def _validate_effect(effect, file_path: str) -> None:
+    """Check the optional schema-v3 'effect' block; fill in defaults in place."""
+    if not isinstance(effect, dict):
+        raise ValueError(f"Operator {file_path} 'effect' must be a mapping.")
+    obs = effect.get("observable")
+    if obs not in _VALID_OBSERVABLES:
+        raise ValueError(
+            f"Operator {file_path} has unknown effect observable '{obs}'. "
+            f"Expected one of {_VALID_OBSERVABLES}."
+        )
+    check = effect.setdefault("check", {})
+    if not isinstance(check, dict):
+        raise ValueError(f"Operator {file_path} 'effect.check' must be a mapping.")
+    unknown = set(check) - set(_VALID_CHECK_KEYS)
+    if unknown:
+        raise ValueError(
+            f"Operator {file_path} 'effect.check' has unknown key(s) {sorted(unknown)}. "
+            f"Expected any of {_VALID_CHECK_KEYS}."
+        )
+    requires = effect.setdefault("requires", [])
+    if not (isinstance(requires, list) and all(isinstance(r, str) for r in requires)):
+        raise ValueError(f"Operator {file_path} 'effect.requires' must be a list of operator ids.")
 
 
 def load_operators(operators_dir: str) -> list[dict]:
