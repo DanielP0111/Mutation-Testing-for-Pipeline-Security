@@ -1,0 +1,295 @@
+Log of Meson test suite run on 2026-10-16T15:23:40.433101
+
+Inherited environment: HOSTNAME=fcf1e3913bdc PWD=/src SOURCE_DATE_EPOCH=1700000000 HOME=/root SHLVL=1 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin _=/usr/local/bin/meson OLDPWD=/work LC_CTYPE=C.UTF-8 
+
+==================================== 1/4 =====================================
+test:         t-hash
+start time:   15:23:40
+duration:     0.03s
+result:       exit status 0
+command:      UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 MALLOC_PERTURB_=89 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 /src/build/t/t-hash
+----------------------------------- stdout -----------------------------------
+ok 1 - SHA1 and SHA256 ("") works
+ok 2 - SHA1 and SHA256 ("a") works
+ok 3 - SHA1 and SHA256 ("abc") works
+ok 4 - SHA1 and SHA256 ("message digest") works
+ok 5 - SHA1 and SHA256 ("abcdefghijklmnopqrstuvwxyz") works
+ok 6 - SHA1 and SHA256 (aaaaaaaaaa_100000.buf) works
+ok 7 - SHA1 and SHA256 (alphabet_100000.buf) works
+ok 8 - SHA1 and SHA256 ("blob 0\0") works
+ok 9 - SHA1 and SHA256 ("blob 3\0abc") works
+ok 10 - SHA1 and SHA256 ("tree 0\0") works
+1..10
+==============================================================================
+
+==================================== 2/4 =====================================
+test:         t1007-hash-object
+start time:   15:23:40
+duration:     0.15s
+result:       exit status 0
+command:      MALLOC_PERTURB_=31 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 GIT_BUILD_DIR=/src/build PATH=/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 /usr/bin/sh t1007-hash-object.sh
+----------------------------------- stdout -----------------------------------
+ok 1 - setup
+ok 2 - multiple '--stdin's are rejected
+ok 3 - Can't use --stdin and --stdin-paths together
+ok 4 - Can't pass filenames as arguments with --stdin-paths
+ok 5 - Can't use --path with --stdin-paths
+ok 6 - Can't use --path with --no-filters
+Initialized empty Git repository in /src/build/test-output/trash directory.t1007-hash-object/test/.git/
+ok 7 - hash a file
+ok 8 - blob does not exist in database
+ok 9 - hash from stdin
+ok 10 - blob does not exist in database
+ok 11 - hash a file and write to database
+ok 12 - blob exists in database
+ok 13 - git hash-object --stdin file1 <file0 first operates on file0, then file1
+ok 14 - set up crlf tests
+ok 15 - check that appropriate filter is invoke when --path is used
+ok 16 - gitattributes also work in a subdirectory
+ok 17 - --path works in a subdirectory
+ok 18 - check that --no-filters option works
+ok 19 - check that --no-filters option works with --stdin-paths
+Initialized empty Git repository in /src/build/test-output/trash directory.t1007-hash-object/test/.git/
+ok 20 - hash from stdin and write to database (-w --stdin)
+ok 21 - blob exists in database
+Initialized empty Git repository in /src/build/test-output/trash directory.t1007-hash-object/test/.git/
+ok 22 - hash from stdin and write to database (--stdin -w)
+ok 23 - blob exists in database
+ok 24 - hash two files with names on stdin
+Initialized empty Git repository in /src/build/test-output/trash directory.t1007-hash-object/test/.git/
+ok 25 - hash two files with names on stdin and write to database (-w --stdin-paths)
+ok 26 - blob exists in database
+ok 27 - blob exists in database
+Initialized empty Git repository in /src/build/test-output/trash directory.t1007-hash-object/test/.git/
+ok 28 - hash two files with names on stdin and write to database (--stdin-paths -w)
+ok 29 - blob exists in database
+ok 30 - blob exists in database
+ok 31 - too-short tree
+ok 32 - malformed mode in tree
+ok 33 - empty filename in tree
+ok 34 - duplicate filename in tree
+ok 35 - corrupt commit
+ok 36 - corrupt tag
+ok 37 - hash-object complains about bogus type name
+ok 38 - hash-object complains about truncated type name
+ok 39 - --literally
+ok 40 - --literally with extra-long type
+ok 41 - --stdin outside of repository (uses SHA-1)
+# passed all 41 test(s)
+1..41
+==============================================================================
+
+==================================== 3/4 =====================================
+test:         t0001-init
+start time:   15:23:40
+duration:     0.69s
+result:       exit status 0
+command:      UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 MALLOC_PERTURB_=66 GIT_BUILD_DIR=/src/build PATH=/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 /usr/bin/sh t0001-init.sh
+----------------------------------- stdout -----------------------------------
+ok 1 - plain
+ok 2 - plain nested in bare
+ok 3 - plain through aliased command, outside any git repo
+ok 4 - plain nested through aliased command
+ok 5 - plain nested in bare through aliased command
+ok 6 - No extra GIT_* on alias scripts
+ok 7 - plain with GIT_WORK_TREE
+ok 8 - plain bare
+ok 9 - plain bare with GIT_WORK_TREE
+ok 10 - GIT_DIR bare
+ok 11 - init --bare
+ok 12 - GIT_DIR non-bare
+ok 13 - GIT_DIR & GIT_WORK_TREE (1)
+ok 14 - GIT_DIR & GIT_WORK_TREE (2)
+ok 15 - reinit
+ok 16 - init with --template
+ok 17 - init with --template (blank)
+ok 18 - init with init.templatedir set
+ok 19 - init with init.templatedir using ~ expansion
+ok 20 - init --bare/--shared overrides system/global config
+ok 21 - init honors global core.sharedRepository
+ok 22 - init allows insanely long --template
+ok 23 - init creates a new directory
+ok 24 - init creates a new bare directory
+ok 25 - init recreates a directory
+ok 26 - init recreates a new bare directory
+ok 27 - init creates a new deep directory
+ok 28 - init creates a new deep directory (umask vs. shared)
+ok 29 - init notices EEXIST (1)
+ok 30 - init notices EEXIST (2)
+ok 31 # skip init notices EPERM (missing SANITY of POSIXPERM,SANITY)
+ok 32 - init creates a new bare directory with global --bare
+ok 33 - init prefers command line to GIT_DIR
+ok 34 - init with separate gitdir
+ok 35 - explicit bare & --separate-git-dir incompatible
+ok 36 - implicit bare & --separate-git-dir incompatible
+ok 37 - bare & --separate-git-dir incompatible within worktree
+ok 38 - init in long base path
+ok 39 - init in long restricted base path
+ok 40 - re-init on .git file
+ok 41 - re-init to update git link
+ok 42 - re-init to move gitdir
+ok 43 - re-init to move gitdir symlink
+ok 44 - re-init to move gitdir with linked worktrees (absolute)
+ok 45 - re-init to move gitdir within linked worktree (absolute)
+ok 46 - re-init to move gitdir with linked worktrees (relative)
+ok 47 - re-init to move gitdir within linked worktree (relative)
+ok 48 # skip .git hidden (missing MINGW)
+ok 49 # skip bare git dir not hidden (missing MINGW)
+ok 50 - remote init from does not use config from cwd
+ok 51 - re-init from a linked worktree
+ok 52 - init honors GIT_DEFAULT_HASH
+ok 53 - init honors --object-format
+ok 54 - init honors init.defaultObjectFormat
+ok 55 - init warns about invalid init.defaultObjectFormat
+ok 56 - --object-format overrides GIT_DEFAULT_HASH
+ok 57 - GIT_DEFAULT_HASH overrides init.defaultObjectFormat
+ok 58 - extensions.objectFormat is not allowed with repo version 0
+ok 59 - init rejects attempts to initialize with different hash
+ok 60 - extensions.refStorage is not allowed with repo version 0
+ok 61 - extensions.refStorage with files backend
+ok 62 - extensions.refStorage with unknown backend
+ok 63 - init with GIT_DEFAULT_REF_FORMAT=garbage
+ok 64 - init warns about invalid init.defaultRefFormat
+ok 65 - init with GIT_DEFAULT_REF_FORMAT=files
+ok 66 - init with --ref-format=files
+ok 67 - init with init.defaultRefFormat=files
+ok 68 - --ref-format=files overrides GIT_DEFAULT_REF_FORMAT
+ok 69 - init with GIT_DEFAULT_REF_FORMAT=reftable
+ok 70 - init with --ref-format=reftable
+ok 71 - init with init.defaultRefFormat=reftable
+ok 72 - --ref-format=reftable overrides GIT_DEFAULT_REF_FORMAT
+ok 73 - --ref-format= overrides GIT_DEFAULT_REF_FORMAT
+ok 74 - GIT_DEFAULT_REF_FORMAT= overrides init.defaultRefFormat
+ok 75 - re-init with same format (files)
+ok 76 - re-init with different format fails (files -> reftable)
+ok 77 - re-init with same format (reftable)
+ok 78 - re-init with different format fails (reftable -> files)
+ok 79 - init with --ref-format=garbage
+ok 80 # skip core.hidedotfiles = false (missing MINGW)
+ok 81 # skip redirect std handles (missing MINGW)
+ok 82 - --initial-branch
+ok 83 - overridden default initial branch name (config)
+ok 84 - advice on unconfigured init.defaultBranch
+ok 85 - overridden default main branch name (env)
+ok 86 - invalid default branch name
+ok 87 - branch -m with the initial branch
+ok 88 - init with includeIf.onbranch condition
+ok 89 - init with includeIf.onbranch condition with existing directory
+ok 90 - re-init with includeIf.onbranch condition
+ok 91 - re-init with includeIf.onbranch condition
+ok 92 - re-init skips non-matching includeIf.onbranch
+ok 93 - re-init reads matching includeIf.onbranch
+# passed all 93 test(s)
+1..93
+==============================================================================
+
+==================================== 4/4 =====================================
+test:         t0000-basic
+start time:   15:23:40
+duration:     2.05s
+result:       exit status 0
+command:      UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=24 MESON_TEST_ITERATION=1 GIT_BUILD_DIR=/src/build PATH=/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 /usr/bin/sh t0000-basic.sh
+----------------------------------- stdout -----------------------------------
+ok 1 - verify that the running shell supports "local"
+ok 2 - .git/objects should be empty after git init in an empty repo
+ok 3 - .git/objects should have 3 subdirectories
+ok 4 - success is reported like this
+ok 5 - subtest: 3 passing tests
+ok 6 - subtest: 2/3 tests passing
+ok 7 - subtest: --immediate
+ok 8 - subtest: a failing TODO test
+ok 9 - subtest: a passing TODO test
+ok 10 - subtest: 2 TODO tests, one passin
+ok 11 - subtest: mixed results: pass, failure and a TODO test
+ok 12 - subtest: mixed results: a mixture of all possible results
+ok 13 - subtest: --verbose option
+ok 14 - subtest: --verbose-only option
+ok 15 - subtest: skip one with GIT_SKIP_TESTS
+ok 16 - subtest: skip several with GIT_SKIP_TESTS
+ok 17 - subtest: sh pattern skipping with GIT_SKIP_TESTS
+ok 18 - subtest: skip entire test suite with GIT_SKIP_TESTS
+ok 19 - subtest: GIT_SKIP_TESTS does not skip unmatched suite
+ok 20 - subtest: --run basic
+ok 21 - subtest: --run with a range
+ok 22 - subtest: --run with two ranges
+ok 23 - subtest: --run with a left open range
+ok 24 - subtest: --run with a right open range
+ok 25 - subtest: --run with basic negation
+ok 26 - subtest: --run with two negations
+ok 27 - subtest: --run a range and negation
+ok 28 - subtest: --run range negation
+ok 29 - subtest: --run include, exclude and include
+ok 30 - subtest: --run include, exclude and include, comma separated
+ok 31 - subtest: --run exclude and include
+ok 32 - subtest: --run empty selectors
+ok 33 - subtest: --run substring selector
+ok 34 - subtest: --run keyword selection
+ok 35 - subtest: --run invalid range end
+ok 36 - subtest: --invert-exit-code without --immediate
+ok 37 - subtest: --invert-exit-code with --immediate: all passed
+ok 38 - subtest: --invert-exit-code without --immediate: partial pass
+ok 39 - subtest: --invert-exit-code with --immediate: partial pass
+ok 40 - subtest: --invert-exit-code --immediate: got a failure
+ok 41 - subtest: tests respect prerequisites
+ok 42 - subtest: tests respect lazy prerequisites
+ok 43 - subtest: nested lazy prerequisites
+ok 44 - subtest: lazy prereqs do not turn off tracing
+ok 45 - subtest: tests clean up after themselves
+ok 46 - subtest: tests clean up even on failures
+ok 47 - subtest: test_atexit is run
+ok 48 - test_oid provides sane info by default
+ok 49 - test_oid can look up data for SHA-1
+ok 50 - test_oid can look up data for SHA-256
+ok 51 - test_oid can look up data for a specified algorithm
+ok 52 - test_bool_env
+ok 53 - git update-index without --add should fail adding
+ok 54 - git update-index with --add should succeed
+ok 55 - writing tree out with git write-tree
+ok 56 - validate object ID of a known tree
+ok 57 - git update-index without --remove should fail removing
+ok 58 - git update-index with --remove should be able to remove
+ok 59 - git write-tree should be able to write an empty tree
+ok 60 - validate object ID of a known tree
+ok 61 - adding various types of objects with git update-index --add
+ok 62 - showing stage with git ls-files --stage
+ok 63 - validate git ls-files output for a known tree
+ok 64 - writing tree out with git write-tree
+ok 65 - validate object ID for a known tree
+ok 66 - showing tree with git ls-tree
+ok 67 - git ls-tree output for a known tree
+ok 68 - showing tree with git ls-tree -r
+ok 69 - git ls-tree -r output for a known tree
+ok 70 - showing tree with git ls-tree -r -t
+ok 71 - git ls-tree -r output for a known tree
+ok 72 - writing partial tree out with git write-tree --prefix
+ok 73 - validate object ID for a known tree
+ok 74 - writing partial tree out with git write-tree --prefix
+ok 75 - validate object ID for a known tree
+ok 76 - put invalid objects into the index
+ok 77 - writing this tree without --missing-ok
+ok 78 - writing this tree with --missing-ok
+ok 79 - git read-tree followed by write-tree should be idempotent
+ok 80 - validate git diff-files output for a know cache/work tree state
+ok 81 - git update-index --refresh should succeed
+ok 82 - no diff after checkout and git update-index --refresh
+ok 83 - git commit-tree records the correct tree in a commit
+ok 84 - git commit-tree records the correct parent in a commit
+ok 85 - git commit-tree omits duplicated parent in a commit
+ok 86 - update-index D/F conflict
+ok 87 - very long name in the index handled sanely
+ok 88 - more update-index D/F conflicts
+ok 89 - test_must_fail on a failing git command
+ok 90 - test_must_fail on a failing git command with env
+ok 91 - test_must_fail rejects a non-git command
+ok 92 - test_must_fail rejects a non-git command with env
+# passed all 92 test(s)
+1..92
+==============================================================================
+
+
+Ok:                 4   
+Expected Fail:      0   
+Fail:               0   
+Unexpected Pass:    0   
+Skipped:            0   
+Timeout:            0   
