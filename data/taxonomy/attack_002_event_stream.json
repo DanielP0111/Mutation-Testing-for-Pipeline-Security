@@ -1,7 +1,7 @@
 {
   "id": "operator_event_stream_transitive_injection",
   "description": "Introduces a malicious transitive package reference into a popular library dependency tree, triggering targeted credential harvesting logic during application bundling.",
-  "target_build_phase": "Dependency Fetch", 
+  "target_build_phase": "Fetch", 
   "injection_location": "package.json", 
   "code_template": "{\n \"dependencies\": {\n    \"{{TARGET_DEPENDENCY}}\": \"{{TARGET_VERSION}}\",\n    \"{{MALICIOUS_TRANSITIVE_PACKAGE}}\":  \"^{{TRANSITIVE_VERSION}}\"\n  }\n}", 
   "preconditions": [
