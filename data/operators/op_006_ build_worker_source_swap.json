@@ -1,0 +1,33 @@
+{
+  "id": "build_worker_source_swap",
+  "name": "Build worker source substitution",
+  "description": "Replace or modify a project's source file on the build worker immediately before compilation, causing the build to incorporate attacker-controlled code while the repository's committed source remains unchanged.",
+  "target_build_phase": "compile",
+  "scheme": "dependency_aware",
+  "mode": "replace",
+  "injection_location": {
+    "file_glob": "{{SOURCE_FILE_GLOB}}",
+    "field": "source_content"
+  },
+  "placeholders": {
+    "SOURCE_FILE": "path to the source file selected for modification",
+    "ORIGINAL_SOURCE": "the original source content read from the target project",
+    "SOURCE_FILE_GLOB": "project-relative glob identifying eligible source files"
+  },
+  "attacker_values": {
+    "MALICIOUS_SOURCE": "ATTACKER_CONTROLLED_SOURCE_CONTENT"
+  },
+  "template": {
+    "file_path": "{{SOURCE_FILE}}",
+    "replacement_value": "{{MALICIOUS_SOURCE}}"
+  },
+  "preconditions": [
+    "project compiles source files on a build worker",
+    "the attacker can modify source files in the build environment before compilation",
+    "the modified source file is consumed by the compiler",
+    "the placement engine supports source-file content replacement"
+  ],
+  "source_attacks": [
+    "SolarWinds SUNBURST (2020)"
+  ]
+}
