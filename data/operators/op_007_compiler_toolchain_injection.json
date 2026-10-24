@@ -1,0 +1,33 @@
+{
+  "id": "compiler_toolchain_injection",
+  "name": "Compiler toolchain injection",
+  "description": "Model a compromised compiler distribution obtained from an untrusted or tampered source that injects unauthorized code into compiled application binaries. The resulting artifacts may contain hidden telemetry or command-and-control functionality.",
+  "target_build_phase": "compile",
+  "scheme": "dependency_aware",
+  "mode": "replace",
+  "injection_location": {
+    "file_glob": "{{COMPILER_FILE_GLOB}}",
+    "field": "compiler_binary"
+  },
+  "placeholders": {
+    "COMPILER_FILE": "path to the compiler executable or toolchain component used by the project",
+    "ORIGINAL_COMPILER": "the legitimate compiler or toolchain artifact selected for replacement",
+    "COMPILER_FILE_GLOB": "project-relative glob identifying the compiler or toolchain artifact"
+  },
+  "attacker_values": {
+    "COMPROMISED_COMPILER": "ATTACKER_CONTROLLED_COMPILER_ARTIFACT"
+  },
+  "template": {
+    "file_path": "{{COMPILER_FILE}}",
+    "replacement_value": "{{COMPROMISED_COMPILER}}"
+  },
+  "preconditions": [
+    "project uses a compiler or toolchain artifact obtained from an external distribution source",
+    "the attacker can substitute or tamper with the compiler artifact before compilation",
+    "the build process executes the substituted compiler",
+    "the placement engine supports compiler artifact replacement"
+  ],
+  "source_attacks": [
+    "XcodeGhost (2015)"
+  ]
+}
