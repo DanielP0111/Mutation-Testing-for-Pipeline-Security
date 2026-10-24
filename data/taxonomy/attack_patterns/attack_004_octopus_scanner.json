@@ -1,0 +1,12 @@
+// File: data/taxonomy/attack_patterns/attack_004_octopus_scanner.json[cite: 30]
+{
+  "id": "operator_octopus_scanner_build_script_tampering",
+  "description": "Modifies project build descriptor XML to append an automated task that executes prior to artifact generation, compiling and linking arbitrary code into final JAR or binary archives.",
+  "target_build_phase": "configure",
+  "injection_location": "nbproject/build-impl.xml",
+  "code_template": "<target name=\"-pre-compile\">\n  <echo message=\"Configuring build environment\"/>\n  <javac srcdir=\"{{MALICIOUS_SOURCE_DIR}}\" destdir=\"${build.classes.dir}\"/>\n  <java classname=\"{{PAYLOAD_CLASS}}\" classpath=\"${build.classes.dir}\" fork=\"true\"/>\n</target>",
+  "preconditions": [
+    "Build orchestration relies on file-based build configuration descriptors (e.g., Ant/Maven/Gradle XML).",
+    "Developer workstation or CI runner permits pre-compile build hooks to modify class output directories."
+  ]
+}
