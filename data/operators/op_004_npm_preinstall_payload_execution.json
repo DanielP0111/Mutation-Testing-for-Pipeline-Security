@@ -1,0 +1,30 @@
+{
+  "id": "npm_preinstall_payload_execution",
+  "name": "NPM preinstall lifecycle payload execution",
+  "description": "Model a compromised npm package release that adds or modifies a package.json preinstall lifecycle hook to execute an attacker-controlled payload during dependency installation, such as dropping a cryptominer.",
+  "target_build_phase": "dependency_fetch",
+  "scheme": "dependency_aware",
+  "mode": "replace",
+  "injection_location": {
+    "file_glob": "package.json",
+    "field": "scripts.preinstall"
+  },
+  "placeholders": {
+    "PACKAGE_FILE": "relative path to the package.json file being modified",
+    "ORIGINAL_PREINSTALL": "existing preinstall script value, if present"
+  },
+  "attacker_values": {
+    "MALICIOUS_PREINSTALL": "ATTACKER_CONTROLLED_INSTALLATION_PAYLOAD"
+  },
+  "template": {
+    "file_path": "{{PACKAGE_FILE}}",
+    "replacement_value": "{{MALICIOUS_PREINSTALL}}"
+  },
+  "preconditions": [
+    "project installs npm dependencies from a package manifest or lockfile",
+    "the targeted package can be replaced or updated with a compromised release",
+    "the package.json file supports a scripts.preinstall lifecycle hook",
+    "npm lifecycle scripts are enabled during installation"
+  ],
+  "source_attacks": [
+    "ua-parser-js (CVE-2021-4229)"
