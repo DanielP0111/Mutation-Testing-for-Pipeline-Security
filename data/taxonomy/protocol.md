@@ -39,6 +39,10 @@ Primary data collection targeted four authoritative repositories and vulnerabili
 * **Confirmed Incidents Included in Master Taxonomy:** 15 verified build pipeline attacks
 * **Representative Incidents Abstracted for Operator Prototype:** 7 attacks
 * **Held-Out Incidents Reserved for Benchmark Defense Evaluation:** 4 attacks
+  *ATK-014 — 3CX DesktopApp (2023)
+  *ATK-015 — Webmin Backdoor (2019, CVE-2019-15107)
+  *ATK-009 — PHP Git Source Tampering (2021)
+  *ATK-011 — Travis CI Secret Leakage (2021)
 
 ## 6. Taxonomy Controlled Vocabularies
 To ensure consistency across the taxonomy database (`attacks.json`), operator specifications, and benchmark evaluations, every attack record is classified using restricted, mutually exclusive vocabularies.
