@@ -39,3 +39,33 @@ Primary data collection targeted four authoritative repositories and vulnerabili
 * **Confirmed Incidents Included in Master Taxonomy:** 15 verified build pipeline attacks
 * **Representative Incidents Abstracted for Operator Prototype:** 7 attacks
 * **Held-Out Incidents Reserved for Benchmark Defense Evaluation:** 4 attacks
+
+## 6. Taxonomy Controlled Vocabularies
+To ensure consistency across the taxonomy database (`attacks.json`), operator specifications, and benchmark evaluations, every attack record is classified using restricted, mutually exclusive vocabularies.
+
+### 6.1 Standardized Build Phases (`build_phase`)
+Each attack is assigned to exactly one build phase representing the primary stage where malicious intervention occurs:
+
+1. **`dependency_fetch`**: Tampering occurs during the acquisition, resolution, or downloading of remote packages, modules, or source dependencies prior to configuration.
+2. **`configure`**: Tampering targets build generation systems, macro resolution, environment probing, or metadata/project descriptors (e.g., `./configure`, CMake, Autotools, or Meson initialization).
+3. **`compile`**: Tampering intercepts source code files, compiler binaries, toolchains, or linking stages during object translation.
+4. **`test`**: Tampering abuses test execution runners, test harnesses, or reporting utilities to harvest runner secrets or execute commands during CI/CD test phases.
+5. **`package_release`**: Tampering modifies compiled binaries, packaged artifacts, installers, or distribution tarballs post-compilation, often prior to digital signature generation or registry publication.
+
+---
+### 6.2 Dataflow Patterns (`dataflow_pattern`)
+The mechanism by which the payload is introduced, activated, or exfiltrated is classified under one of the following 13 predefined categories:
+
+* **`code_insertion`**: Injects macro expansions, scripts, or hooks that conditionally synthesize payload code during build initialization.
+* **`dependency_injection`**: Introduces a malicious direct or transitive dependency into an application manifest or dependency tree.
+* **`build_script_tampering`**: Directly modifies build automation configuration files (e.g., XML descriptors, Makefiles, or build manifests) to inject tasks.
+* **`source_swap`**: Intercepts active compiler or worker processes to temporarily replace clean source code on disk with a backdoored variant immediately prior to compiler read operations.
+* **`compiler_injection`**: Compromises the native compiler, assembler, or toolchain binary to automatically inject payloads into output object files without modifying source files.
+* **`runtime_injection`**: Statically links trojanized routines or runtime libraries directly into clean application binaries during final assembly.
+* **`source_tampering`**: Commits malicious source logic directly to upstream source repositories via compromised committer or server credentials.
+* **`credential_exfiltration`**: Modifies pipeline utilities or install hooks to transmit runner environment variables, deployment tokens, or secrets to external attacker infrastructure.
+* **`memory_harvesting`**: Abuses multi-tenant or shared CI runner execution memory and unpurged build caches to harvest sensitive credentials.
+* **`binary_tampering`**: Modifies compiled executables or installer archives on staging servers prior to digital certificate signing.
+* **`library_substitution`**: Replaces bundled third-party dynamic libraries (e.g., `.dll`, `.so`) within application staging directories before installer packaging.
+* **`tarball_injection`**: Directly alters the contents of a released source tarball or distribution package on build mirrors such that it diverges from the git repository.
+* **`script_injection`**: Exploits unescaped CI/CD runner context expressions (e.g., GitHub Actions template injection) to execute arbitrary commands inside workflow steps.
