@@ -1,0 +1,12 @@
+// File: data/taxonomy/attack_patterns/attack_003_pytorch_nightly.json[cite: 29]
+{
+  "id": "operator_pytorch_dependency_confusion",
+  "description": "Registers an internal dependency name on a public repository with an inflated semantic version to hijack resolution precedence over private/alternative index feeds during package installation.",
+  "target_build_phase": "dependency_fetch",
+  "injection_location": "requirements.txt",
+  "code_template": "--extra-index-url {{PUBLIC_INDEX_URL}}\n{{INTERNAL_PACKAGE_NAME}}=={{HIGHER_VERSION}}",
+  "preconditions": [
+    "Package manager prioritizes public repositories or highest semantic version over internal indices.",
+    "Target repository lacks namespace reservation, private registry scoping, or strict hash pinning."
+  ]
+}
