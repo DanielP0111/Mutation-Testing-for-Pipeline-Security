@@ -1,0 +1,32 @@
+{
+  "id": "ci_workflow_context_injection",
+  "name": "CI workflow context injection",
+  "description": "Model unsafe interpolation of untrusted event or pull-request context into a CI workflow's executable script, allowing attacker-controlled input to alter script behavior during workflow execution.",
+  "target_build_phase": "test",
+  "scheme": "dependency_aware",
+  "mode": "replace",
+  "injection_location": {
+    "file_glob": ".github/workflows/*.yml",
+    "field": "run"
+  },
+  "placeholders": {
+    "WORKFLOW_FILE": "relative path to the workflow file being modified",
+    "ORIGINAL_RUN_SCRIPT": "the existing run-script content that incorporates untrusted event context"
+  },
+  "attacker_values": {
+    "INJECTED_RUN_SCRIPT": "ATTACKER_CONTROLLED_SCRIPT_CONTENT"
+  },
+  "template": {
+    "file_path": "{{WORKFLOW_FILE}}",
+    "replacement_value": "{{INJECTED_RUN_SCRIPT}}"
+  },
+  "preconditions": [
+    "project contains a CI workflow with an executable run step",
+    "untrusted pull-request or issue context is interpolated into executable script content without safe handling",
+    "the workflow executes in a context with access to sensitive runner credentials or repository permissions",
+    "the placement engine supports workflow YAML files and run-field replacement"
+  ],
+  "source_attacks": [
+    "GitHub Actions Template Injection (2025)"
+  ]
+}
