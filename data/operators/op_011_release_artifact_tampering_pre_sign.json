@@ -1,0 +1,33 @@
+{
+  "id": "release_artifact_tampering_pre_sign",
+  "name": "Pre-signing release artifact tampering",
+  "description": "Model unauthorized modification of a release binary during package assembly before digital signing, causing the distributed artifact to contain attacker-controlled code while potentially retaining a valid signature from the legitimate publisher.",
+  "target_build_phase": "package_release",
+  "scheme": "dependency_aware",
+  "mode": "replace",
+  "injection_location": {
+    "file_glob": "{{RELEASE_ARTIFACT_GLOB}}",
+    "field": "artifact_content"
+  },
+  "placeholders": {
+    "RELEASE_ARTIFACT": "path to the release artifact selected for modification",
+    "ORIGINAL_ARTIFACT": "the legitimate artifact content or artifact reference before modification",
+    "RELEASE_ARTIFACT_GLOB": "project-relative glob identifying eligible release artifacts"
+  },
+  "attacker_values": {
+    "TAMPERED_ARTIFACT": "ATTACKER_CONTROLLED_ARTIFACT_CONTENT"
+  },
+  "template": {
+    "file_path": "{{RELEASE_ARTIFACT}}",
+    "replacement_value": "{{TAMPERED_ARTIFACT}}"
+  },
+  "preconditions": [
+    "project has a release packaging process that assembles distributable artifacts",
+    "the attacker can modify an artifact before the signing stage",
+    "the packaging pipeline includes the modified artifact in the release",
+    "the placement engine supports release artifact replacement"
+  ],
+  "source_attacks": [
+    "ASUS Live Update (ShadowHammer) (2019)"
+  ]
+}
