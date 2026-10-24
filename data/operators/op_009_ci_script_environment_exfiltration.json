@@ -1,0 +1,34 @@
+{
+  "id": "ci_script_environment_exfiltration",
+  "name": "CI script environment exfiltration",
+  "description": "Model unauthorized modification of a remotely fetched CI script to add behavior that collects and transmits sensitive environment data during a test or CI job.",
+  "target_build_phase": "test",
+  "scheme": "dependency_aware",
+  "mode": "insert_after",
+  "injection_location": {
+    "file_glob": "{{CI_SCRIPT_GLOB}}",
+    "field": "script_line"
+  },
+  "placeholders": {
+    "CI_SCRIPT_FILE": "relative path to the CI script selected for modification",
+    "ANCHOR_LINE": "existing script line used as the insertion point",
+    "CI_SCRIPT_GLOB": "project-relative glob identifying eligible CI scripts"
+  },
+  "attacker_values": {
+    "INJECTED_SCRIPT_LINE": "ATTACKER_CONTROLLED_ENVIRONMENT_DATA_EXFILTRATION_LOGIC"
+  },
+  "template": {
+    "file_path": "{{CI_SCRIPT_FILE}}",
+    "anchor": "{{ANCHOR_LINE}}",
+    "replacement_value": "{{INJECTED_SCRIPT_LINE}}"
+  },
+  "preconditions": [
+    "project or CI workflow executes a script fetched from a remote source",
+    "the attacker can modify the hosted script or its delivered contents",
+    "the script executes in a CI environment with access to sensitive variables",
+    "the placement engine supports script-line anchors and insert_after mode"
+  ],
+  "source_attacks": [
+    "Codecov Bash Uploader (2021)"
+  ]
+}
