@@ -1,0 +1,33 @@
+{
+  "id": "build_runtime_routine_injection",
+  "name": "Build runtime routine injection",
+  "description": "Model a compromised build workstation or compiler runtime component injecting unauthorized runtime behavior into a legitimate application's compiled binary, potentially allowing the modified artifact to appear authentic when distributed.",
+  "target_build_phase": "compile",
+  "scheme": "dependency_aware",
+  "mode": "replace",
+  "injection_location": {
+    "file_glob": "{{BUILD_COMPONENT_GLOB}}",
+    "field": "runtime_routine"
+  },
+  "placeholders": {
+    "BUILD_COMPONENT_FILE": "path to the compiler runtime or build component selected for modification",
+    "ORIGINAL_ROUTINE": "the existing runtime routine or component content",
+    "BUILD_COMPONENT_GLOB": "project-relative glob identifying eligible compiler runtime or build components"
+  },
+  "attacker_values": {
+    "COMPROMISED_ROUTINE": "ATTACKER_CONTROLLED_RUNTIME_ROUTINE"
+  },
+  "template": {
+    "file_path": "{{BUILD_COMPONENT_FILE}}",
+    "replacement_value": "{{COMPROMISED_ROUTINE}}"
+  },
+  "preconditions": [
+    "project is compiled on a build workstation that uses the targeted runtime or build component",
+    "the attacker can modify that component before compilation",
+    "the compiler or linker incorporates the modified behavior into the output binary",
+    "the placement engine supports runtime routine replacement"
+  ],
+  "source_attacks": [
+    "CCleaner (Piriform) (2017)"
+  ]
+}
