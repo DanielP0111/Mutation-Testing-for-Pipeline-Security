@@ -1,0 +1,62 @@
+[
+  {
+    "id": "BEN-001",
+    "project": "git",
+    "commit_hash": "a4f82c1e8d90",
+    "target_file": "meson.build",
+    "change_type": "compiler_flag_update",
+    "description": "Add -Wno-unused-parameter to suppression flags for legacy submodules",
+    "diff_snippet": "+ add_project_arguments('-Wno-unused-parameter', language: 'c')",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-002",
+    "project": "numpy",
+    "commit_hash": "e7b91d4a3c20",
+    "target_file": "subprojects/lapack.wrap",
+    "change_type": "dependency_version_bump",
+    "description": "Bump OpenBLAS dependency revision in wrap file to 0.3.26",
+    "diff_snippet": "- revision = v0.3.25\n+ revision = v0.3.26",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-003",
+    "project": "scipy",
+    "commit_hash": "c1d3e5f7a9b2",
+    "target_file": "meson.build",
+    "change_type": "option_configuration",
+    "description": "Expose use-g77-abi build option for legacy Fortran ABI compatibility",
+    "diff_snippet": "+ option('use-g77-abi', type: 'boolean', value: false, description: 'Compile with g77 ABI')",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-004",
+    "project": "numpy",
+    "commit_hash": "9f2a4b8c1d3e",
+    "target_file": "numpy/meson.build",
+    "change_type": "source_addition",
+    "description": "Add new SIMD dispatch source files to C compilation target",
+    "diff_snippet": "+ 'core/src/common/simd_dispatch.c',",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-005",
+    "project": "scipy",
+    "commit_hash": "5b8d2e4f7a1c",
+    "target_file": "meson.build",
+    "change_type": "test_target_definition",
+    "description": "Register automated linalg benchmark test runner in meson test",
+    "diff_snippet": "+ test('linalg-benchmark', py, args: ['-m', 'pytest', 'scipy/linalg/tests'])",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-006",
+    "project": "git",
+    "commit_hash": "3e1a7b9c5d2f",
+    "target_file": "meson.build",
+    "change_type": "path_normalization",
+    "description": "Fix install_dir prefix resolution on macOS homebrew environments",
+    "diff_snippet": "- install_dir: get_option('prefix') / 'bin'\n+ install_dir: get_option('bindir')",
+    "label": "benign"
+  }
+]
