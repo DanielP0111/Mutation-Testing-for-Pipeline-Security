@@ -1,0 +1,13 @@
+# Related Work
+
+## Software Supply Chain Security and Pipeline Taxonomies
+Securing software supply chains has motivated frameworks such as Supply-chain Levels for Software Artifacts (SLSA), which formalizes build integrity requirements across provenance, hermeticity, and isolated build workers. Recent empirical literature has categorized broader supply chain threats across package ecosystems (Ohm et al., 2020; Ladisa et al., 2023), identifying lifecycle script abuses and dependency confusion as dominant vectors. However, existing taxonomies frequently treat the build process as an atomic transition from source repository to published artifact, failing to model internal pipeline lifecycle phases where tampering can evade source code static analysis.
+
+## Mutation Testing in Security and Defense Benchmarking
+Mutation testing has long served as an empirical benchmark in software engineering to evaluate the adequacy of automated test suites by injecting synthetic, syntactic faults into program source code (Jia and Harman, 2011; Papadakis et al., 2019). While historically utilized for fault detection in application logic, mutation analysis has recently been adapted to security contexts, including fuzzing harness evaluation and policy rule validation. However, existing mutation frameworks operate exclusively on application source code rather than build system architectures. This project bridges this gap: rather than modifying runtime source code, we synthesize real-world build-stage attack patterns across five distinct phases (`dependency_fetch`, `configure`, `compile`, `test`, and `package_release`) into domain-specific mutation operators. This enables the first systematic, adversarial benchmark to evaluate whether pipeline integrity defenses such as PipelineSave can successfully detect and block subversion across the build lifecycle.
+
+## References
+- Jia, Y., & Harman, M. (2011). An analysis and survey of the development of mutation testing. *IEEE Transactions on Software Engineering*, 37(5), 649-678.
+- Ladisa, P., Plate, H., Martinez, M., & Falleri, J. R. (2023). SoK: Taxonomy of Attacks on Open-Source Software Supply Chains. *IEEE Symposium on Security and Privacy (S&P)*.
+- Ohm, M., Plate, H., Sykosch, A., & Meier, M. (2020). Backstabber's knife collection: A review of open source software supply chain attacks. *Detection of Intrusions and Malware, and Vulnerability Assessment (DIMVA)*.
+- Papadakis, M., Kintis, M., Zhang, J., Jia, Y., Traon, Y. L., & Harman, M. (2019). Mutation testing advances: An analysis and survey. *Advances in Computers*, 112, 275-378.
