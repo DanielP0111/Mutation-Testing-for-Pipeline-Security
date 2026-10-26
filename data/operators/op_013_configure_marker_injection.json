@@ -1,0 +1,37 @@
+{
+  "id": "configure_marker_injection",
+  "name": "Configure-stage build-script command injection (effect-bearing)",
+  "description": "Worked example of an effective configure-stage mutant on the git target. Appends a run_command(...) to the top-level meson.build that executes during 'meson setup' and drops a PWNED_* marker file, modeling a configure-stage build-script injection (Octopus Scanner / XZ configure hook). The injection is additive, so the build still compiles (build_valid) and the marker is observed, letting the validator classify the mutant as 'effective'.",
+  "target_build_phase": "configure",
+  "scheme": "config_aware",
+  "mode": "append",
+  "injection_location": {
+    "file_glob": "meson.build",
+    "field": "configure_hook"
+  },
+  "placeholders": {
+    "MESON_BUILD": "relative path to the meson.build being modified"
+  },
+  "attacker_values": {
+    "MARKER_ID": "git001"
+  },
+  "template": {
+    "file_path": "{{MESON_BUILD}}",
+    "replacement_value": "run_command('sh', '-c', 'echo pwned > /tmp/PWNED_configtime_{{MARKER_ID}}', check: false)"
+  },
+  "preconditions": [
+    "project uses Meson and has a top-level meson.build evaluated during setup",
+    "run_command executes at configure time; the injected command must not abort setup (check: false)"
+  ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_configtime"
+    },
+    "requires": []
+  },
+  "source_attacks": [
+    "Octopus Scanner (2020)",
+    "XZ Utils (CVE-2024-3094)"
+  ]
+}

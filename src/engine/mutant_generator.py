@@ -78,7 +78,7 @@ def generate_mutant(
 
     text = target_file.read_text(encoding="utf-8", errors="replace")
 
-    if original_value not in text:
+    if mode != "append" and original_value not in text:
         # The expected value wasn't found — record but mark as not applied
         return _mutant_record(filled_operator, str(dst_root), applied=False)
 
@@ -112,6 +112,12 @@ def _apply_change(
     """
     if mode == "replace":
         return text.replace(original_value, replacement_value, 1)
+
+    if mode == "append":
+        # Append replacement_value as a new top-level line at end of file.
+        nl = "\r\n" if "\r\n" in text else "\n"
+        sep = "" if text.endswith(nl) or text == "" else nl
+        return text + sep + replacement_value + nl
 
     # Line-oriented modes preserve the file's original newline style.
     newline = "\r\n" if "\r\n" in text else "\n"

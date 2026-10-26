@@ -12,6 +12,7 @@ template filling or mutant generation.
 """
 
 import json
+import sys
 from pathlib import Path
 
 import yaml
@@ -21,7 +22,7 @@ import yaml
 # are not required here.
 _REQUIRED_TOP = ("id", "scheme", "template")
 _VALID_SCHEMES = ("dependency_aware", "config_aware", "adversarial", "all")
-_VALID_MODES = ("replace", "delete_line", "insert_after")
+_VALID_MODES = ("replace", "delete_line", "insert_after", "append")
 _VALID_OBSERVABLES = ("file_write", "network_fetch", "env_exfil",
                       "artifact_diff", "test_input_swap")
 _VALID_CHECK_KEYS = ("marker", "request_path", "contains", "artifact",
@@ -114,7 +115,7 @@ def _validate_effect(effect, file_path: str) -> None:
         raise ValueError(f"Operator {file_path} 'effect.requires' must be a list of operator ids.")
 
 
-def load_operators(operators_dir: str) -> list[dict]:
+def load_operators(operators_dir: str, strict: bool = False) -> list[dict]:
     """
     Load every operator spec in a directory (JSON and YAML), sorted by filename.
 
@@ -133,7 +134,20 @@ def load_operators(operators_dir: str) -> list[dict]:
         raise FileNotFoundError(f"Operators directory not found: {operators_dir}")
 
     operators = []
+    skipped = []
     for spec in sorted(root.iterdir()):
-        if spec.suffix.lower() in (".json", ".yaml", ".yml"):
+        if spec.suffix.lower() not in (".json", ".yaml", ".yml"):
+            continue
+        if strict:
             operators.append(load_operator(str(spec)))
+            continue
+        try:
+            operators.append(load_operator(str(spec)))
+        except (ValueError, FileNotFoundError) as exc:
+            skipped.append(spec.name)
+            print(f"WARNING: skipping malformed operator {spec.name}: {exc}",
+                  file=sys.stderr)
+    if skipped:
+        print(f"WARNING: {len(skipped)} operator(s) skipped: "
+              + ", ".join(skipped), file=sys.stderr)
     return operators

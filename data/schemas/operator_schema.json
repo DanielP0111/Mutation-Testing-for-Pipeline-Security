@@ -43,7 +43,8 @@
       "enum": [
         "replace",
         "delete_line",
-        "insert_after"
+        "insert_after",
+        "append"
       ],
       "default": "replace"
     },

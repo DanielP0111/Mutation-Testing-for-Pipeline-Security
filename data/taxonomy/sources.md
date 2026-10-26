@@ -3,7 +3,7 @@
 This bibliography documents authoritative research, post-mortems, advisories, and CVE definitions used to construct the build-pipeline attack taxonomy.
 
 ### Authoritative Repositories & Catalogs
-1. **NIST National Vulnerability Database (NVD)**: CVE-2024-3094 (XZ Utils), CVE-2019-15107 (Webmin), CVE-2023-42793 (TeamCity), CVE-2020-10148 (SolarWinds).
+1. **NIST National Vulnerability Database (NVD)**: CVE-2024-3094 (XZ Utils), CVE-2019-15107 (Webmin), CVE-2023-42793 (TeamCity), CVE-2023-29059 (3CX DesktopApp), CVE-2021-41077 (Travis CI). Note: SolarWinds SUNBURST has no assigned CVE; CVE-2020-10148 is the related Orion API authentication-bypass (SUPERNOVA), not SUNBURST.
 2. **CISA Known Exploited Vulnerabilities (KEV) Catalog & Alerts**:
    - Alert AA20-352A (SolarWinds Orion Supply Chain Compromise)
    - Alert TA15-266A (Compromised Xcode Compiler)

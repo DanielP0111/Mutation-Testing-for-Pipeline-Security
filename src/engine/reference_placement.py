@@ -13,6 +13,10 @@ for the placement workstream.
 """
 
 
+import glob as _glob
+import os as _os
+
+
 def reference_find_candidates(parsed_project: dict, operator: dict) -> list[dict]:
     """
     Find dependency-aware candidates for a wrap-field operator.
@@ -21,15 +25,23 @@ def reference_find_candidates(parsed_project: dict, operator: dict) -> list[dict
     parsed wrap file. Returns candidate dicts with:
         scheme, file_path, field, current_value, placeholder_map
     """
-    if operator.get("scheme") not in ("dependency_aware", "all"):
-        return []
+    scheme = operator.get("scheme")
+    if scheme in ("config_aware", "all"):
+        cfg = _config_aware_candidates(parsed_project, operator)
+        if scheme == "config_aware":
+            return cfg
+    else:
+        cfg = []
+
+    if scheme not in ("dependency_aware", "all"):
+        return cfg
 
     loc = operator.get("injection_location", {})
     field = loc.get("field")
     if not field:
         return []
 
-    candidates = []
+    candidates = list(cfg)
     for wrap in parsed_project.get("wrap_files", []):
         current = wrap.get(field)
         if not current:
@@ -54,3 +66,33 @@ def reference_find_candidates(parsed_project: dict, operator: dict) -> list[dict
         )
 
     return candidates
+
+
+def _config_aware_candidates(parsed_project: dict, operator: dict) -> list[dict]:
+    """Find meson.build files to receive a configure-stage injection.
+
+    Reference scaffolding for config_aware operators (append/insert_after on a
+    build file). Globs operator.injection_location.file_glob under the project
+    root; defaults to the top-level meson.build.
+    """
+    root = parsed_project.get("project_dir")
+    if not root:
+        return []
+    loc = operator.get("injection_location", {})
+    pattern = loc.get("file_glob", "meson.build")
+    field = loc.get("field", "configure_hook")
+    recursive = "**" in pattern
+    matches = _glob.glob(_os.path.join(root, pattern), recursive=recursive)
+    out = []
+    for path in sorted(matches):
+        if not _os.path.isfile(path):
+            continue
+        rel = _os.path.relpath(path, root)
+        out.append({
+            "scheme": "config_aware",
+            "file_path": rel,
+            "field": field,
+            "current_value": "",   # append mode does not match an anchor
+            "placeholder_map": {"MESON_BUILD": rel},
+        })
+    return out
