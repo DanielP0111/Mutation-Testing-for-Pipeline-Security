@@ -1,5 +1,5 @@
 {
-  "id": "git_release_artifact_tampering_pre_sign",
+  "id": "release_artifact_tampering_pre_sign",
   "name": "Pre-signing release artifact tampering (effect-bearing)",
   "description": "Worked example of an effective package_release mutant on the git target. Models unauthorized modification of a release binary during package assembly before digital signing, causing the distributed artifact to contain attacker-controlled code while retaining a valid signature from the legitimate publisher. This operator carries an effect block so the validator can classify the mutant as 'effective'.",
   "target_build_phase": "package_release",
