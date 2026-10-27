@@ -1,32 +1,36 @@
 {
-  "id": "release_artifact_tampering_pre_sign",
-  "name": "Pre-signing release artifact tampering",
-  "description": "Model unauthorized modification of a release binary during package assembly before digital signing, causing the distributed artifact to contain attacker-controlled code while potentially retaining a valid signature from the legitimate publisher.",
+  "id": "git_release_artifact_tampering_pre_sign",
+  "name": "Pre-signing release artifact tampering (effect-bearing)",
+  "description": "Worked example of an effective package_release mutant on the git target. Models unauthorized modification of a release binary during package assembly before digital signing, causing the distributed artifact to contain attacker-controlled code while retaining a valid signature from the legitimate publisher. This operator carries an effect block so the validator can classify the mutant as 'effective'.",
   "target_build_phase": "package_release",
   "scheme": "dependency_aware",
   "mode": "replace",
   "injection_location": {
-    "file_glob": "{{RELEASE_ARTIFACT_GLOB}}",
+    "file_glob": "release/*",
     "field": "artifact_content"
   },
   "placeholders": {
-    "RELEASE_ARTIFACT": "path to the release artifact selected for modification",
-    "ORIGINAL_ARTIFACT": "the legitimate artifact content or artifact reference before modification",
-    "RELEASE_ARTIFACT_GLOB": "project-relative glob identifying eligible release artifacts"
+    "RELEASE_ARTIFACT": "relative path to the release artifact selected for modification"
   },
   "attacker_values": {
-    "TAMPERED_ARTIFACT": "ATTACKER_CONTROLLED_ARTIFACT_CONTENT"
+    "TAMPERED_CONTENT": "attacker-controlled binary payload or artifact content"
   },
   "template": {
     "file_path": "{{RELEASE_ARTIFACT}}",
-    "replacement_value": "{{TAMPERED_ARTIFACT}}"
+    "replacement_value": "{{TAMPERED_CONTENT}}"
   },
   "preconditions": [
     "project has a release packaging process that assembles distributable artifacts",
-    "the attacker can modify an artifact before the signing stage",
-    "the packaging pipeline includes the modified artifact in the release",
-    "the placement engine supports release artifact replacement"
+    "the attacker can modify an artifact before the digital signing stage",
+    "the packaging pipeline includes the modified artifact in the final release"
   ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_release"
+    },
+    "requires": []
+  },
   "source_attacks": [
     "ASUS Live Update (ShadowHammer) (2019)"
   ]
