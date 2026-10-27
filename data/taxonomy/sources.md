@@ -16,6 +16,7 @@ This bibliography documents authoritative research, post-mortems, advisories, an
 4. **Trail of Bits Research**:
    - *Supply chain attacks are exploiting our assumptions* (CI/CD and GitHub Actions template injection analysis).
 5. **Vendor Post-Mortems & Threat Research**:
+   - Gazzillo, P. (2026). *Defining Software Development Pipeline Code Attacks.* University of Central Florida. (Source for ATK-016 CIDER, ATK-017 HackerBot-Claw, ATK-018 xssfox; formalizes Poisoned Pipeline Execution, D-PPE/I-PPE.)
    - Mandiant / CrowdStrike SolarWinds SUNBURST & Sunspot Technical Breakdown.
    - Cisco Talos CCleaner C2 Survey and Technical Analysis.
    - Orca Security Python Supply Chain Attack Analysis (PyPI ctx & phpass).

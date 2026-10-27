@@ -178,5 +178,41 @@
     "dataflow_pattern": "tarball_injection",
     "detection_difficulty": 3,
     "notes": "Backdoor inserted into password_change.cgi on build server; differed from GitHub repo"
+  },
+  {
+    "id": "ATK-016",
+    "name": "CIDER (Direct Poisoned Pipeline Execution)",
+    "year": 2017,
+    "cve": "None",
+    "source_url": "https://paulgazzillo.com/papers/gazzillo-defining-software-development-pipeline-attacks-2026.pdf",
+    "build_phase": "test",
+    "attack_vector": "Forked-repo pull request modifies the CI/CD pipeline configuration file; the attacker-triggered pipeline run reads and exfiltrates developer credentials (Direct Poisoned Pipeline Execution, D-PPE)",
+    "dataflow_pattern": "build_script_tampering",
+    "detection_difficulty": 2,
+    "notes": "Early researcher demonstration of PPE (DEF CON 25). Per Gazzillo 2026. REVIEW: paper frames this as Poisoned Pipeline Execution, an attack class the taxonomy has no dedicated dataflow pattern for; effect is credential_exfiltration."
+  },
+  {
+    "id": "ATK-017",
+    "name": "HackerBot-Claw",
+    "year": 2026,
+    "cve": "None",
+    "source_url": "https://paulgazzillo.com/papers/gazzillo-defining-software-development-pipeline-attacks-2026.pdf",
+    "build_phase": "test",
+    "attack_vector": "Autonomous AI agent performs Direct Poisoned Pipeline Execution (D-PPE) across many repositories via forked-PR pipeline-config modification, stealing CI credentials",
+    "dataflow_pattern": "build_script_tampering",
+    "detection_difficulty": 4,
+    "notes": "Malicious autonomous agent; reported victims include Trivy, Microsoft, DataDog. Per Gazzillo 2026. Same PPE class note as ATK-016."
+  },
+  {
+    "id": "ATK-018",
+    "name": "xssfox (Indirect Poisoned Pipeline Execution)",
+    "year": 2021,
+    "cve": "None",
+    "source_url": "https://paulgazzillo.com/papers/gazzillo-defining-software-development-pipeline-attacks-2026.pdf",
+    "build_phase": "test",
+    "attack_vector": "Indirect Poisoned Pipeline Execution (I-PPE): modifies a deployment script invoked by the pipeline (not the pipeline config itself, evading config review) to send credentials to an external server",
+    "dataflow_pattern": "build_script_tampering",
+    "detection_difficulty": 3,
+    "notes": "Per Gazzillo 2026 (orig. blog 2021-02-18). REVIEW: paper classifies this in a 'deploy' phase the taxonomy's build_phase vocabulary does not include; mapped to 'test' as the nearest CI-execution bucket. Effect is credential_exfiltration."
   }
 ]

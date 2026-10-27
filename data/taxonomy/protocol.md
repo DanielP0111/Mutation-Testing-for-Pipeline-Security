@@ -36,7 +36,7 @@ Primary data collection targeted four authoritative repositories and vulnerabili
   * *Reason 2: Corporate network lateral movement without pipeline tampering (9)*
   * *Reason 3: Theoretical vulnerabilities without documented real-world exploitation (4)*
 * **Full Incidents Assessed for Pipeline Tampering:** 21 candidate incidents
-* **Confirmed Incidents Included in Master Taxonomy:** 15 verified build pipeline attacks
+* **Confirmed Incidents Included in Master Taxonomy:** 18 verified build pipeline attacks (15 from the systematic funnel; 3 added from Gazzillo (2026), "Defining Software Development Pipeline Code Attacks": ATK-016 CIDER, ATK-017 HackerBot-Claw, ATK-018 xssfox)
 * **Representative Incidents Abstracted for Operator Prototype:** 7 attacks
 * **Held-Out Incidents Reserved for Benchmark Defense Evaluation:** 4 attacks
   *ATK-014 — 3CX DesktopApp (2023)
