@@ -1,7 +1,7 @@
 {
   "id": "ci_workflow_context_injection",
-  "name": "CI workflow context injection",
-  "description": "Model unsafe interpolation of untrusted event or pull-request context into a CI workflow's executable script, allowing attacker-controlled input to alter script behavior during workflow execution.",
+  "name": "CI workflow context injection (effect-bearing)",
+  "description": "Worked example of an effective test-stage mutant on the git target. Models unsafe interpolation of untrusted event or pull-request context into a CI workflow's executable script, allowing attacker-controlled input to alter script behavior during workflow execution and drop a marker file. This operator carries an effect block so the validator can classify the mutant as 'effective'.",
   "target_build_phase": "test",
   "scheme": "dependency_aware",
   "mode": "replace",
@@ -10,23 +10,29 @@
     "field": "run"
   },
   "placeholders": {
-    "WORKFLOW_FILE": "relative path to the workflow file being modified",
-    "ORIGINAL_RUN_SCRIPT": "the existing run-script content that incorporates untrusted event context"
+    "WORKFLOW_FILE": "relative path to the workflow file being modified"
   },
   "attacker_values": {
-    "INJECTED_RUN_SCRIPT": "ATTACKER_CONTROLLED_SCRIPT_CONTENT"
+    "MARKER_ID": "git001"
   },
   "template": {
     "file_path": "{{WORKFLOW_FILE}}",
-    "replacement_value": "{{INJECTED_RUN_SCRIPT}}"
+    "replacement_value": "echo pwned > /tmp/PWNED_ci_{{MARKER_ID}}"
   },
   "preconditions": [
     "project contains a CI workflow with an executable run step",
     "untrusted pull-request or issue context is interpolated into executable script content without safe handling",
-    "the workflow executes in a context with access to sensitive runner credentials or repository permissions",
-    "the placement engine supports workflow YAML files and run-field replacement"
+    "the workflow executes in a context with access to repository test execution"
   ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_ci"
+    },
+    "requires": []
+  },
   "source_attacks": [
-    "GitHub Actions Template Injection (2025)"
+    "GitHub Actions Template Injection (2025)",
+    "Codecov (2021)"
   ]
 }
