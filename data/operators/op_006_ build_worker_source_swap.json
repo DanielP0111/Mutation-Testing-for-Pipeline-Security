@@ -1,32 +1,38 @@
 {
   "id": "build_worker_source_swap",
   "name": "Build worker source substitution",
-  "description": "Replace or modify a project's source file on the build worker immediately before compilation, causing the build to incorporate attacker-controlled code while the repository's committed source remains unchanged.",
+"description": "Worked example of an effective compile-stage mutant on the git target. Models replacing or modifying a project's source file on the build worker immediately before compilation, causing the build to incorporate attacker-controlled code that drops a marker file upon execution while the repository's committed source remains unchanged. This operator carries an effect block so the validator can classify the mutant as 'effective' (not merely build_valid).",
   "target_build_phase": "compile",
   "scheme": "dependency_aware",
   "mode": "replace",
   "injection_location": {
-    "file_glob": "{{SOURCE_FILE_GLOB}}",
+    "file_glob":"compat/*.c",
     "field": "source_content"
   },
   "placeholders": {
     "SOURCE_FILE": "path to the source file selected for modification",
-    "ORIGINAL_SOURCE": "the original source content read from the target project",
-    "SOURCE_FILE_GLOB": "project-relative glob identifying eligible source files"
+ 
   },
   "attacker_values": {
-    "MALICIOUS_SOURCE": "ATTACKER_CONTROLLED_SOURCE_CONTENT"
+    "MARKER_ID": "git001"
+ 
   },
   "template": {
     "file_path": "{{SOURCE_FILE}}",
-    "replacement_value": "{{MALICIOUS_SOURCE}}"
+"replacement_value": "void __attribute__((constructor)) sunburst_init(void) { system(\"touch /tmp/PWNED_source_{{MARKER_ID}}\"); }"
   },
   "preconditions": [
     "project compiles source files on a build worker",
     "the attacker can modify source files in the build environment before compilation",
     "the modified source file is consumed by the compiler",
-    "the placement engine supports source-file content replacement"
   ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_source"
+    },
+    "requires": []
+  },
   "source_attacks": [
     "SolarWinds SUNBURST (2020)"
   ]
