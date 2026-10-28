@@ -1,7 +1,7 @@
 {
   "id": "ci_script_environment_exfiltration",
   "name": "CI script environment exfiltration",
-  "description": "Model unauthorized modification of a remotely fetched CI script to add behavior that collects and transmits sensitive environment data during a test or CI job.",
+"description": "Worked example of an effective test-stage mutant on the git target. Models unauthorized modification of a CI script to add behavior that collects and transmits sensitive environment data during test execution to an attacker-controlled mock endpoint. This operator carries an effect block so the validator can classify the mutant as 'effective' (not merely build_valid).",
   "target_build_phase": "test",
   "scheme": "dependency_aware",
   "mode": "insert_after",
