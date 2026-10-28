@@ -1,7 +1,7 @@
 {
   "id": "build_runtime_routine_injection",
   "name": "Build runtime routine injection",
-  "description": "Model a compromised build workstation or compiler runtime component injecting unauthorized runtime behavior into a legitimate application's compiled binary, potentially allowing the modified artifact to appear authentic when distributed.",
+"description": "Worked example of an effective compile-stage mutant on the git target. Models a compromised build workstation or compiler runtime component injecting unauthorized runtime behavior into a legitimate application's compiled binary that drops a marker file upon execution. This operator carries an effect block so the validator can classify the mutant as 'effective' (not merely build_valid).",
   "target_build_phase": "compile",
   "scheme": "dependency_aware",
   "mode": "replace",
