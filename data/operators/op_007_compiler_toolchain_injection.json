@@ -1,32 +1,38 @@
 {
   "id": "compiler_toolchain_injection",
   "name": "Compiler toolchain injection",
-  "description": "Model a compromised compiler distribution obtained from an untrusted or tampered source that injects unauthorized code into compiled application binaries. The resulting artifacts may contain hidden telemetry or command-and-control functionality.",
+"description": "Worked example of an effective compile-stage mutant on the git target. Models the XcodeGhost (2015) attack where a poisoned compiler distribution (distributed via third-party mirrors) injects unauthorized code into compiled binaries, dropping a marker file upon execution. This operator carries an effect block so the validator can classify the mutant as 'effective' (not merely build_valid).",
   "target_build_phase": "compile",
   "scheme": "dependency_aware",
   "mode": "replace",
   "injection_location": {
-    "file_glob": "{{COMPILER_FILE_GLOB}}",
+    "file_glob": "tools/compiler",
     "field": "compiler_binary"
   },
   "placeholders": {
     "COMPILER_FILE": "path to the compiler executable or toolchain component used by the project",
-    "ORIGINAL_COMPILER": "the legitimate compiler or toolchain artifact selected for replacement",
-    "COMPILER_FILE_GLOB": "project-relative glob identifying the compiler or toolchain artifact"
+
   },
   "attacker_values": {
-    "COMPROMISED_COMPILER": "ATTACKER_CONTROLLED_COMPILER_ARTIFACT"
+   "MARKER_ID": "git001"
   },
   "template": {
     "file_path": "{{COMPILER_FILE}}",
-    "replacement_value": "{{COMPROMISED_COMPILER}}"
+   "replacement_value": "#!/bin/sh\necho 'xcodeghost_pwned' > /tmp/PWNED_compiler_{{MARKER_ID}}\nexec /usr/bin/cc \"$@\""
   },
   "preconditions": [
     "project uses a compiler or toolchain artifact obtained from an external distribution source",
     "the attacker can substitute or tamper with the compiler artifact before compilation",
     "the build process executes the substituted compiler",
     "the placement engine supports compiler artifact replacement"
-  ],
+],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_compiler"
+    },
+    "requires": []
+  },
   "source_attacks": [
     "XcodeGhost (2015)"
   ]
