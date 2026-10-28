@@ -2,31 +2,36 @@
 {
   "id": "netbeans_build_script_tampering",
   "name": "NetBeans build descriptor tampering",
-  "description": "Model malware modifying a NetBeans Ant build descriptor to inject unauthorized build logic, causing malicious code to be compiled into generated JAR artifacts.",
+"description": "Worked example of an effective compile-stage mutant on the git target. Models malware modifying a build or configuration descriptor to inject unauthorized build logic, causing malicious code to drop a marker file upon execution. This operator carries an effect block so the validator can classify the mutant as 'effective' (not merely build_valid).",
   "target_build_phase": "compile",
   "scheme": "dependency_aware",
   "mode": "replace",
   "injection_location": {
     "file_glob": "**/build-impl.xml",
     "field": "build_target"
-  },
+},
   "placeholders": {
-    "BUILD_FILE": "relative path to the NetBeans build-impl.xml file being modified",
-    "ORIGINAL_BUILD_TARGET": "existing build target or supported insertion point in the build descriptor"
+    "BUILD_FILE": "relative path to the build descriptor file being modified"
   },
   "attacker_values": {
-    "MALICIOUS_BUILD_LOGIC": "ATTACKER_CONTROLLED_BUILD_LOGIC"
+    "MARKER_ID": "git001"
   },
   "template": {
     "file_path": "{{BUILD_FILE}}",
-    "replacement_value": "{{MALICIOUS_BUILD_LOGIC}}"
+    "replacement_value": "<target name=\"pwn\"><exec executable=\"sh\"><arg value=\"-c\"/><arg value=\"touch /tmp/PWNED_netbeans_{{MARKER_ID}}\"/></exec></target>"
   },
   "preconditions": [
-    "project contains a NetBeans Ant build descriptor such as build-impl.xml",
+    "project contains a build descriptor file",
     "the attacker can modify the build descriptor before compilation",
-    "the build system processes the modified descriptor",
-    "the operator engine supports the specified build_target locator and replace mode"
+    "the build system processes the modified descriptor"
   ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_netbeans"
+    },
+    "requires": []
+  },
   "source_attacks": [
     "Octopus Scanner (2020)"
   ]
