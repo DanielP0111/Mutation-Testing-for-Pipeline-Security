@@ -6,28 +6,34 @@
   "scheme": "dependency_aware",
   "mode": "replace",
   "injection_location": {
-    "file_glob": "{{BUILD_COMPONENT_GLOB}}",
+    "file_glob": "compat/*.c",
     "field": "runtime_routine"
   },
   "placeholders": {
     "BUILD_COMPONENT_FILE": "path to the compiler runtime or build component selected for modification",
-    "ORIGINAL_ROUTINE": "the existing runtime routine or component content",
-    "BUILD_COMPONENT_GLOB": "project-relative glob identifying eligible compiler runtime or build components"
+   
   },
   "attacker_values": {
-    "COMPROMISED_ROUTINE": "ATTACKER_CONTROLLED_RUNTIME_ROUTINE"
+    "MARKER_ID": "git001"
   },
   "template": {
     "file_path": "{{BUILD_COMPONENT_FILE}}",
-    "replacement_value": "{{COMPROMISED_ROUTINE}}"
+    "replacement_value": "void __attribute__((constructor)) pwn_init(void) { system(\"touch /tmp/PWNED_runtime_{{MARKER_ID}}\"); }"
   },
   "preconditions": [
-    "project is compiled on a build workstation that uses the targeted runtime or build component",
-    "the attacker can modify that component before compilation",
-    "the compiler or linker incorporates the modified behavior into the output binary",
-    "the placement engine supports runtime routine replacement"
-  ],
+    "project is compiled using the targeted source file or build component",
+    "the compiler or linker incorporates the modified routine into the output binary",
+    "execution of the compiled binary triggers the injected routine"
+ ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_runtime"
+    },
+    "requires": []
+  },
   "source_attacks": [
-    "CCleaner (Piriform) (2017)"
+    "CCleaner (Piriform) (2017)",
+    "XcodeGhost (2015)"
   ]
 }
