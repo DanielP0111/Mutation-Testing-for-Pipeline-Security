@@ -10,7 +10,7 @@
     "field": "runtime_routine"
   },
   "placeholders": {
-    "BUILD_COMPONENT_FILE": "path to the compiler runtime or build component selected for modification",
+    "BUILD_COMPONENT_FILE": "path to the compiler runtime or build component selected for modification"
    
   },
   "attacker_values": {
