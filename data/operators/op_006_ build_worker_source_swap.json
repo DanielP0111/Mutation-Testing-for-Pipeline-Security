@@ -10,7 +10,7 @@
     "field": "source_content"
   },
   "placeholders": {
-    "SOURCE_FILE": "path to the source file selected for modification",
+    "SOURCE_FILE": "path to the source file selected for modification"
  
   },
   "attacker_values": {
