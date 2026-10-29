@@ -24,7 +24,7 @@
   "preconditions": [
     "project compiles source files on a build worker",
     "the attacker can modify source files in the build environment before compilation",
-    "the modified source file is consumed by the compiler",
+    "the modified source file is consumed by the compiler"
   ],
   "effect": {
     "observable": "file_write",
