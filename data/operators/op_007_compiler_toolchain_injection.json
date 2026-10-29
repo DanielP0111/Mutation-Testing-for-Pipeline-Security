@@ -10,7 +10,7 @@
     "field": "compiler_binary"
   },
   "placeholders": {
-    "COMPILER_FILE": "path to the compiler executable or toolchain component used by the project",
+    "COMPILER_FILE": "path to the compiler executable or toolchain component used by the project"
 
   },
   "attacker_values": {
