@@ -15,7 +15,7 @@
   },
  "template": {
   "file_path": "{{MESON_BUILD}}",
-  "replacement_value": "custom_target('nb_hook', output: 'nb_hook.stamp', command: ['sh', '-c', 'touch /tmp/PWNEDnetbeans{{MARKER_ID}} && touch @OUTPUT@'], build_by_default: true)"
+  "replacement_value": "custom_target('nb_hook', output: 'nb_hook.stamp', command: ['sh', '-c', 'touch /tmp/PWNED_netbeans_{{MARKER_ID}} && touch @OUTPUT@'], build_by_default: true)"
 },
   "preconditions": [
     "Meson custom_target that runs during compile"
