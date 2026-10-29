@@ -10,7 +10,7 @@
     "field": "scripts.preinstall"
   },
   "placeholders": {
-    "PACKAGE_FILE": "relative path to the package.json file being modified",
+    "PACKAGE_FILE": "relative path to the package.json file being modified"
  },
   "attacker_values": {
     "MARKER_ID": "git001"
