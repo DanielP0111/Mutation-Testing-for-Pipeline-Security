@@ -4,26 +4,21 @@
   "name": "NetBeans build descriptor tampering",
 "description": "Worked example of an effective compile-stage mutant on the git target. Models malware modifying a build or configuration descriptor to inject unauthorized build logic, causing malicious code to drop a marker file upon execution. This operator carries an effect block so the validator can classify the mutant as 'effective' (not merely build_valid).",
   "target_build_phase": "compile",
-  "scheme": "dependency_aware",
-  "mode": "replace",
-  "injection_location": {
-    "file_glob": "**/build-impl.xml",
-    "field": "build_target"
-},
-  "placeholders": {
-    "BUILD_FILE": "relative path to the build descriptor file being modified"
+ "scheme": "config_aware",
+  "mode": "append",
+  "injection_location": { "file_glob": "meson.build", "field": "build_hook" 
+  },
+  "placeholders": { "MESON_BUILD": "relative path to the meson.build being modified" 
   },
   "attacker_values": {
     "MARKER_ID": "git001"
   },
-  "template": {
-    "file_path": "{{BUILD_FILE}}",
-    "replacement_value": "<target name=\"pwn\"><exec executable=\"sh\"><arg value=\"-c\"/><arg value=\"touch /tmp/PWNED_netbeans_{{MARKER_ID}}\"/></exec></target>"
-  },
+ "template": {
+  "file_path": "{{MESON_BUILD}}",
+  "replacement_value": "custom_target('nb_hook', output: 'nb_hook.stamp', command: ['sh', '-c', 'touch /tmp/PWNEDnetbeans{{MARKER_ID}} && touch @OUTPUT@'], build_by_default: true)"
+},
   "preconditions": [
-    "project contains a build descriptor file",
-    "the attacker can modify the build descriptor before compilation",
-    "the build system processes the modified descriptor"
+    "Meson custom_target that runs during compile"
   ],
   "effect": {
     "observable": "file_write",
