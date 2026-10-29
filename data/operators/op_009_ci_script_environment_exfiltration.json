@@ -11,7 +11,7 @@
   },
   "placeholders": {
     "CI_SCRIPT_FILE": "relative path to the CI script selected for modification",
-    "ANCHOR_LINE": "existing script line used as the insertion point",
+    "ANCHOR_LINE": "existing script line used as the insertion point"
 
   },
   "attacker_values": {
