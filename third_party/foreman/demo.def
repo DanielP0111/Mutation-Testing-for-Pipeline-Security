@@ -1,0 +1,10 @@
+Bootstrap: docker
+From: ubuntu:24.04
+
+%post
+    apt update -y
+    apt upgrade -y
+    apt install -y wget xz-utils build-essential software-properties-common autotools-dev autoconf m4 po4a doxygen
+    add-apt-repository ppa:deadsnakes/ppa
+    apt update -y
+    apt install -y python3.14

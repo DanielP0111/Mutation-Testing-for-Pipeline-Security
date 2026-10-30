@@ -24,7 +24,7 @@ maps directly onto them:
 | Cap II — per-phase sandbox | `systemd-nspawn` process/namespace isolation (XZ demo) | block | `network_fetch`, `env_exfil`, cross-phase `file_write` |
 | Cap I — phase-isolation checker (Foreman) | per-phase JSON spec of command + permitted files; compares file access times before/after each phase (177-line Python prototype, Pappas & Gazzillo, ICSE-NIER '26) | detect | unexpected file reads/writes (`file_write`, `source_swap`); not network or env |
 
-Status: Foreman is public (Zenodo 10.5281/zenodo.18233614, CC BY 4.0, v1.0.1) and can be integrated now. The `systemd-nspawn` sandbox is still planned work in the paper; waiting on that code from Kevin
+Status: Foreman is public (Zenodo 10.5281/zenodo.18233614; code Apache-2.0), vendored in `third_party/foreman/` and wired into the harness (`run_pipeline.py --foreman`). The `systemd-nspawn` sandbox is still planned work in the paper; waiting on that code from Kevin
 (reminder sent). Until then, only the outside baselines below are runnable.
 
 ## Outside baselines (no PipelineSave code required)

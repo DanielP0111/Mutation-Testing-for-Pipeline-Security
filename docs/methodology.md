@@ -169,7 +169,7 @@ oracle consumes.
 The defense of record is PipelineSave: its per-phase sandbox is evaluated as a
 *blocking* defense and its phase-isolation checker as a *detecting* defense.
 The checker is Foreman (Pappas & Gazzillo, 2026), now publicly released
-(Zenodo, CC BY 4.0). Foreman runs each build phase from a JSON specification
+(Zenodo; code under Apache-2.0). Foreman runs each build phase from a JSON specification
 of the phase's command and permitted files, compares file access times before
 and after the phase, and reports accesses the specification forbids. Two
 properties shape how it is scored here: it observes **file accesses only** (not

@@ -44,6 +44,7 @@ from src.parser import parse_project
 from src.engine import load_operators, fill_template, generate_mutant
 from src.engine.validator import validate_mutant, classify_runs
 from src.engine.harness_runner import run_in_harness, load_run, DEFAULT_TESTS
+from src.engine import foreman_spec
 from src.engine.reference_placement import reference_find_candidates
 from src.placement import find_candidates as placement_find_candidates
 from src.engine.defense_runner import (
@@ -66,14 +67,19 @@ def _unified_diff(original_root: Path, mutant_rec: dict) -> str:
     )
 
 
-def _load_or_run_baseline(target_root: Path, baseline_dir: Path, tests, wrap_mode) -> dict:
+def _load_or_run_baseline(target_root: Path, baseline_dir: Path, tests, wrap_mode,
+                          foreman_spec: str | None = None) -> dict:
     """Reuse an existing baseline run if one is there; otherwise build it now."""
     if (baseline_dir / "status.json").exists():
+        if foreman_spec and not (baseline_dir / "foreman_info.txt").exists():
+            raise SystemExit(f"--foreman needs a baseline built under Foreman; {baseline_dir} "
+                             "was not. Pass a new --baseline dir and it will be built.")
         print(f"using existing baseline in {baseline_dir}")
         return load_run(str(baseline_dir))
-    print(f"no baseline in {baseline_dir}; building clean target in the harness...")
+    print(f"no baseline in {baseline_dir}; building clean target in the harness"
+          + (" under Foreman" if foreman_spec else "") + "...")
     return run_in_harness(str(target_root), str(baseline_dir),
-                          tests=tests, wrap_mode=wrap_mode)
+                          tests=tests, wrap_mode=wrap_mode, foreman_spec=foreman_spec)
 
 
 def run(target: str, operators_dir: str, out_dir: str,
@@ -81,7 +87,8 @@ def run(target: str, operators_dir: str, out_dir: str,
         harness: bool = False, baseline: str | None = None, runs: int = 3,
         tests=DEFAULT_TESTS, wrap_mode: str | None = None,
         defenses: list[str] | None = None,
-        only: set[str] | None = None) -> list[dict]:
+        only: set[str] | None = None,
+        foreman: str | None = None) -> list[dict]:
     target_root = Path(target).resolve()
     parsed = parse_project(str(target_root))
     operators = load_operators(operators_dir)
@@ -103,10 +110,20 @@ def run(target: str, operators_dir: str, out_dir: str,
     if harness:
         baseline_dir = Path(baseline) if baseline else out_root / "_baseline"
         baseline_run = _load_or_run_baseline(target_root, baseline_dir.resolve(),
-                                             tests, wrap_mode)
+                                             tests, wrap_mode, foreman_spec=foreman)
         if baseline_run.get("status", {}).get("compile_rc") != 0:
             raise SystemExit(f"baseline in {baseline_dir} did not compile; "
                              "fix the clean build before running mutants")
+        if foreman:
+            spec = foreman_spec.load_spec(foreman)
+            if foreman_spec.needs_learning(spec):
+                learned = foreman_spec.learn_from_info(baseline_dir / "foreman_info.txt", target_root)
+                foreman = str((out_root / "foreman_spec_learned.json").resolve())
+                Path(foreman).write_text(json.dumps(learned, indent=2), encoding="utf-8")
+                print(f"foreman: learned phase permissions from the clean build -> {foreman}")
+            else:
+                foreman = str(Path(foreman).resolve())
+            print(f"foreman: clean-build warnings under this spec are checked per mutant run")
 
     for operator in operators:
         candidates = placement_find_candidates(parsed, operator)
@@ -134,7 +151,7 @@ def run(target: str, operators_dir: str, out_dir: str,
                 runs_root = out_root / "_runs" / mutant_name
                 mutant_runs = [
                     run_in_harness(record["mutant_dir"], str(runs_root / f"run{i}"),
-                                   tests=tests, wrap_mode=wrap_mode)
+                                   tests=tests, wrap_mode=wrap_mode, foreman_spec=foreman)
                     for i in range(1, runs + 1)
                 ]
                 record["validity"] = classify_runs(mutant_runs, baseline_run, effect)
@@ -149,6 +166,15 @@ def run(target: str, operators_dir: str, out_dir: str,
                 record["defenses"] = (
                     run_defenses(defenses, record["mutant_dir"], defense_manifests)
                     if record["applied"] else [])
+            if foreman and harness and record["applied"]:
+                # Foreman is a detector that runs during the build: a mutant is
+                # detected if any run produced a warning the clean build did not.
+                base_w = set(baseline_run.get("foreman_warnings", []))
+                new_w = sorted({w for r in mutant_runs for w in r.get("foreman_warnings", [])} - base_w)
+                record.setdefault("defenses", []).append({
+                    "name": "foreman", "mode": "detect", "blocked": False,
+                    "detected": bool(new_w), "flags": new_w[:50],
+                    "spec": foreman})
 
             # Provenance alongside the mutant.
             diff = _unified_diff(target_root, record)
@@ -185,6 +211,10 @@ def main() -> int:
     ap.add_argument("--defense", action="append", default=[], metavar="NAME",
                     help="static defense to run against each mutant (repeatable); "
                          "available: " + (", ".join(available_defenses()) or "none"))
+    ap.add_argument("--foreman", default=None, metavar="SPEC",
+                    help="run every harness build under Foreman (Pappas & Gazzillo) with this "
+                         "phase spec; a spec with no permissions is learned from the clean build. "
+                         "Needs --harness and a baseline dir built under Foreman.")
     ap.add_argument("--only", action="append", default=[], metavar="OP",
                     help="run only this operator (file prefix like op_013, or its id); repeatable")
     args = ap.parse_args()
@@ -205,7 +235,7 @@ def main() -> int:
                   args.validate, args.reference_placement,
                   harness=args.harness, baseline=args.baseline, runs=args.runs,
                   tests=tuple(args.tests.split()), wrap_mode=args.wrap_mode,
-                  defenses=args.defense, only=only or None)
+                  defenses=args.defense, only=only or None, foreman=args.foreman)
 
     applied = sum(1 for r in results if r["applied"])
     valid = sum(1 for r in results
@@ -218,6 +248,11 @@ def main() -> int:
         flaky = sum(1 for r in results if r.get("validity", {}).get("flaky"))
         print("validity levels: " + ", ".join(f"{k}={v}" for k, v in sorted(levels.items())) +
               f" (flaky={flaky})")
+    if args.foreman:
+        eff = [r for r in results if r.get("validity", {}).get("level") == "effective"]
+        det = sum(1 for r in eff if any(d["name"] == "foreman" and d.get("detected")
+                                        for d in r.get("defenses", [])))
+        print(f"defense foreman: detected {det}/{len(eff)} effective mutant(s)")
     if args.defense:
         applied_n = sum(1 for r in results if r.get("applied"))
         for name in args.defense:

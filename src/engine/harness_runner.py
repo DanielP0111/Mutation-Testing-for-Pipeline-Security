@@ -28,6 +28,7 @@ def run_in_harness(
     wrap_mode: str | None = None,
     image: str = DEFAULT_IMAGE,
     timeout: int = 3600,
+    foreman_spec: str | None = None,
 ) -> dict:
     """
     Build and test `source_dir` in the harness container; return load_run(out_dir).
@@ -46,6 +47,15 @@ def run_in_harness(
     cmd += ["-e", f"TESTS={' '.join(tests)}"]
     if wrap_mode:
         cmd += ["-e", f"WRAP_MODE={wrap_mode}"]
+    if foreman_spec:
+        # Foreman decides "accessed" from file access times, so /src must record
+        # every read: a tmpfs mounted with strictatime (Docker's default overlay
+        # uses relatime, which would hide repeat reads). Foreman itself is the
+        # vendored, unmodified copy in third_party/foreman.
+        cmd += ["--tmpfs", "/src:rw,exec,strictatime,size=16g",
+                "-e", "FOREMAN_SPEC=/work/foreman_spec.json",
+                "-v", f"{Path(foreman_spec).resolve()}:/work/foreman_spec.json:ro",
+                "-v", f"{REPO_ROOT / 'third_party' / 'foreman'}:/work/foreman:ro"]
     cmd += [
         "-v", f"{HARNESS_DIR}:/work/harness:ro",
         "-v", f"{src}:/work/target:ro",
@@ -110,4 +120,5 @@ def load_run(out_dir: str) -> dict:
         "tests": tests,
         "markers": [l for l in read("markers.txt").splitlines() if l.strip()],
         "requests": [l for l in read("mock_server.log").splitlines() if l.strip()],
+        "foreman_warnings": [l for l in read("foreman_warnings.txt").splitlines() if l.strip()],
     }

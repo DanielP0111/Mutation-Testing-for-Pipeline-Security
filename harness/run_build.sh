@@ -7,9 +7,13 @@
 #   /work/harness  this folder (read-only)
 #   /work/target   project source (read-only; copied to /src before building)
 #   /work/out      results are written here
+#   /work/foreman  vendored Foreman (read-only; only when FOREMAN_SPEC is set)
 # Env:
-#   TESTS      space-separated meson test names to run (empty = skip tests)
-#   WRAP_MODE  optional meson --wrap-mode (e.g. forcefallback)
+#   TESTS         space-separated meson test names to run (empty = skip tests)
+#   WRAP_MODE     optional meson --wrap-mode (e.g. forcefallback)
+#   FOREMAN_SPEC  optional path to a Foreman phase spec; when set, the four
+#                 steps run as Foreman build phases (see harness/step.sh) and
+#                 /src must be mounted with strictatime (harness_runner does it)
 #
 # Outputs in /work/out:
 #   status.json      exit codes of each step
@@ -18,10 +22,12 @@
 #   markers.txt      paths of any PWNED_* marker files found after the run
 #   mock_server.log  every request the mock attacker server received
 #   *.log            raw step logs
+#   foreman_info.txt / foreman_warnings.txt   (Foreman runs only)
 set -u
 OUT=/work/out
 mkdir -p "$OUT"
 : > "$OUT/mock_server.log"
+rm -f "$OUT"/*.rc
 
 # Fake secret that env-exfiltration operators try to steal.
 export CANARY_SECRET="CANARY_SECRET_7f3a91"
@@ -31,35 +37,39 @@ python3 /work/harness/mock_server.py 8000 "$OUT/mock_server.log" &
 MOCK_PID=$!
 sleep 1
 
-rm -rf /src
-cp -a /work/target /src
+# Copy the project into /src (works whether /src is a plain dir or a tmpfs mount).
+mkdir -p /src
+find /src -mindepth 1 -delete 2>/dev/null
+cp -a /work/target/. /src/
 rm -rf /src/build
 cd /src
 
-meson subprojects download > "$OUT/fetch.log" 2>&1
-fetch_rc=$?
-
-meson setup build --buildtype=release ${WRAP_MODE:+--wrap-mode=$WRAP_MODE} \
-  > "$OUT/setup.log" 2>&1
-setup_rc=$?
-
-compile_rc=-1
-test_rc=-1
-if [ "$setup_rc" -eq 0 ]; then
-  meson compile -C build > "$OUT/compile.log" 2>&1
-  compile_rc=$?
+if [ -n "${FOREMAN_SPEC:-}" ]; then
+  python3 - "$FOREMAN_SPEC" /src/build_phases.json <<'PY'
+import json, sys
+spec = json.load(open(sys.argv[1]))
+phases = []
+for name in ("fetch", "setup", "compile", "test"):
+    p = {"name": name, "commands": [["bash", "/work/harness/step.sh", name]]}
+    perms = spec.get("phases", {}).get(name)
+    if perms:
+        p["permissions"] = perms
+    phases.append(p)
+json.dump(phases, open(sys.argv[2], "w"), indent=2)
+PY
+  cp /src/build_phases.json "$OUT/foreman_build_phases.json"
+  awk '$2=="/src"{print $4}' /proc/mounts > "$OUT/foreman_mount_opts.txt"
+  python3 /work/harness/foreman_launch.py -C /src \
+    -oi "$OUT/foreman_info.txt" -ow "$OUT/foreman_warnings.txt" > "$OUT/foreman.log" 2>&1
+  echo $? > "$OUT/foreman.rc"
+else
+  for step in fetch setup compile test; do
+    bash /work/harness/step.sh "$step"
+  done
 fi
 
-if [ "$compile_rc" -eq 0 ]; then
-  find build -type f \( -name 'git' -o -name '*.a' -o -name '*.so' \) \
-    -exec sha256sum {} + | sort -k2 > "$OUT/hashes.txt"
-  if [ -n "${TESTS:-}" ]; then
-    # shellcheck disable=SC2086
-    meson test -C build $TESTS > "$OUT/tests.log" 2>&1
-    test_rc=$?
-    cp build/meson-logs/testlog.json "$OUT/testlog.json" 2>/dev/null || true
-  fi
-fi
+rc() { cat "$OUT/$1.rc" 2>/dev/null || echo -1; }
+fetch_rc=$(rc fetch); setup_rc=$(rc setup); compile_rc=$(rc compile); test_rc=$(rc test)
 
 # Marker files a mutant may have dropped anywhere it could write.
 find /src /tmp /root -name 'PWNED_*' 2>/dev/null | sort > "$OUT/markers.txt"
