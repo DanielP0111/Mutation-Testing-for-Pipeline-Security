@@ -1,0 +1,38 @@
+{
+  "id": "configure_marker_injection_intree",
+  "name": "Configure-stage build-script command injection, payload written inside the source tree (effect-bearing)",
+  "description": "In-tree variant of op_013. Appends a run_command(...) to the top-level meson.build that executes during 'meson setup' and drops a PWNED_* marker at the root of the source tree instead of /tmp, modeling a configure-stage injection that stages its payload next to the project's own files. Paired with op_013 it separates 'the defense cannot observe where the payload lands' from 'the defense observed it but the policy allowed it'.",
+  "target_build_phase": "configure",
+  "scheme": "config_aware",
+  "mode": "append",
+  "injection_location": {
+    "file_glob": "meson.build",
+    "field": "configure_hook"
+  },
+  "placeholders": {
+    "MESON_BUILD": "relative path to the meson.build being modified"
+  },
+  "attacker_values": {
+    "MARKER_ID": "git001"
+  },
+  "template": {
+    "file_path": "{{MESON_BUILD}}",
+    "replacement_value": "run_command('sh', '-c', 'echo pwned > \"$0\"/PWNED_configtime_intree_{{MARKER_ID}}', meson.project_source_root(), check: false)"
+  },
+  "preconditions": [
+    "project uses Meson and has a top-level meson.build evaluated during setup",
+    "run_command executes at configure time; the injected command must not abort setup (check: false)",
+    "the source tree is writable during the build"
+  ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_configtime_intree"
+    },
+    "requires": []
+  },
+  "source_attacks": [
+    "Octopus Scanner (2020)",
+    "XZ Utils (CVE-2024-3094)"
+  ]
+}

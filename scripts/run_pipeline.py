@@ -267,11 +267,19 @@ def main() -> int:
                                         for d in r.get("defenses", [])))
         print(f"defense foreman: detected {det}/{len(eff)} effective mutant(s)")
     if args.defense:
-        applied_n = sum(1 for r in results if r.get("applied"))
+        applied = [r for r in results if r.get("applied")]
+        eff = [r for r in applied if r.get("validity", {}).get("level") == "effective"]
         for name in args.defense:
-            blocked = sum(1 for r in results if r.get("applied") and any(
-                d["name"] == name and d["blocked"] for d in r.get("defenses", [])))
-            print(f"defense {name}: blocked {blocked}/{applied_n} applied mutant(s)")
+            def blocked(r):
+                return any(d["name"] == name and d["blocked"] for d in r.get("defenses", []))
+            if args.harness:
+                # Scored only on effective mutants (methodology 2.5): blocking a
+                # mutant that never worked is not a defense success.
+                print(f"defense {name}: blocked {sum(map(blocked, eff))}/{len(eff)} effective mutant(s)"
+                      f"  [{sum(map(blocked, applied))}/{len(applied)} of all applied, incl. non-effective]")
+            else:
+                print(f"defense {name}: blocked {sum(map(blocked, applied))}/{len(applied)} applied mutant(s)"
+                      " (no --harness, so effectiveness is unknown)")
     for r in results:
         v = r.get("validation", {}).get("status", "n/a")
         lvl = r.get("validity", {}).get("level", "n/a")

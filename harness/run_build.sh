@@ -48,6 +48,19 @@ rm -rf /src/build
 # "-dirty" — noise for both Foreman's access logs and the output hashes.
 # Set KEEP_GIT_DIR=1 to keep it.
 [ -n "${KEEP_GIT_DIR:-}" ] || rm -rf /src/.git
+# Make every build really process its wrap files: remove each wrap's extracted
+# directory so `meson subprojects download` re-extracts it from the package
+# cache (subprojects/packagecache), checking source_hash on the way. Without
+# this Meson sees the extracted folders, logs "Already downloaded" and never
+# reads the wrap, so wrap mutations change nothing ("dormant" mutants).
+# Set KEEP_EXTRACTED_SUBPROJECTS=1 to skip.
+if [ -z "${KEEP_EXTRACTED_SUBPROJECTS:-}" ]; then
+  for w in /src/subprojects/*.wrap; do
+    [ -f "$w" ] || continue
+    d=$(sed -n 's/^[[:space:]]*directory[[:space:]]*=[[:space:]]*//p' "$w" | head -1)
+    case "$d" in ""|*/*|.|..) ;; *) rm -rf "/src/subprojects/$d" ;; esac
+  done
+fi
 cd /src
 
 if [ -n "${FOREMAN_SPEC:-}" ]; then

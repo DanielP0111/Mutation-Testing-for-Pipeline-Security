@@ -1,0 +1,36 @@
+{
+  "id": "build_hook_marker_injection_intree",
+  "name": "Compile-time build hook, payload written inside the source tree (effect-bearing)",
+  "description": "In-tree variant of op_005. Appends a build_by_default custom_target to the top-level meson.build that runs during 'meson compile' and drops a PWNED_* marker at the root of the source tree instead of /tmp (Octopus Scanner-style build hook). Paired with op_005 it separates 'outside the defense's view' from 'observed but allowed'.",
+  "target_build_phase": "compile",
+  "scheme": "config_aware",
+  "mode": "append",
+  "injection_location": {
+    "file_glob": "meson.build",
+    "field": "build_hook"
+  },
+  "placeholders": {
+    "MESON_BUILD": "relative path to the meson.build being modified"
+  },
+  "attacker_values": {
+    "MARKER_ID": "git001"
+  },
+  "template": {
+    "file_path": "{{MESON_BUILD}}",
+    "replacement_value": "custom_target('intree_hook', output: 'intree_hook.stamp', command: ['sh', '-c', 'echo pwned > \"$0\"/PWNED_compiletime_intree_{{MARKER_ID}} && touch \"$1\"', meson.project_source_root(), '@OUTPUT@'], build_by_default: true)"
+  },
+  "preconditions": [
+    "project uses Meson; a build_by_default custom_target runs during meson compile, not setup",
+    "the source tree is writable during the build"
+  ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_compiletime_intree"
+    },
+    "requires": []
+  },
+  "source_attacks": [
+    "Octopus Scanner (2020)"
+  ]
+}
