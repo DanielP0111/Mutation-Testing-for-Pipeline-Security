@@ -22,9 +22,9 @@ maps directly onto them:
 | Capability | Mechanism | Mode | Effects it addresses |
 | --- | --- | --- | --- |
 | Cap II — per-phase sandbox | `systemd-nspawn` process/namespace isolation (XZ demo) | block | `network_fetch`, `env_exfil`, cross-phase `file_write` |
-| Cap I — build tracer (Foreman) | `strace` syscall/file-access tracing | detect | `file_write`, `source_swap`, unexpected file reads |
+| Cap I — phase-isolation checker (Foreman) | per-phase JSON spec of command + permitted files; compares file access times before/after each phase (177-line Python prototype, Pappas & Gazzillo, ICSE-NIER '26) | detect | unexpected file reads/writes (`file_write`, `source_swap`); not network or env |
 
-Status: blocked on receiving the Foreman + `systemd-nspawn` code from Kevin
+Status: Foreman is public (Zenodo 10.5281/zenodo.18233614, CC BY 4.0, v1.0.1) and can be integrated now. The `systemd-nspawn` sandbox is still planned work in the paper; waiting on that code from Kevin
 (reminder sent). Until then, only the outside baselines below are runnable.
 
 ## Outside baselines (no PipelineSave code required)
@@ -36,9 +36,9 @@ produces the evidence they need.
 | Dimension | Tool / mechanism | Mode | Effects covered | Attacks hit | Integration effort | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | Artifact integrity | in-toto provenance / hash pinning | detect (block if gating) | `artifact_diff`, `tarball_injection`, `binary_tampering`, `library_substitution` | SolarWinds, 3CX, Webmin, ASUS | medium | `wrap_integrity_check` is a first slice (wrap URL/hash pinning); extend to output-hash provenance |
-| Network isolation | eBPF egress filter (advisor's "ebnf" — confirm) | block | `network_fetch`, `env_exfil` | Codecov, Travis, CIDER, xssfox, HackerBot | low | harness already runs `--network none` + logs the mock server; a "no unexpected egress" check over `mock_server.log` is nearly free |
+| Network isolation | eBPF egress filter (confirmed: advisor's "ebnf" = eBPF) | block | `network_fetch`, `env_exfil` | Codecov, Travis, CIDER, xssfox, HackerBot | low | harness already runs `--network none` + logs the mock server; a "no unexpected egress" check over `mock_server.log` is nearly free |
 | File-access monitoring | `strace`-style write/read monitor | detect | `file_write`, `source_swap` | XZ, SolarWinds, Octopus | low | local run flagging writes outside the build tree; maps to op_013's marker |
-| CI/CD hardening | GitHub Actions hardener — "cosseter" unresolved; likely StepSecurity Harden-Runner (runtime egress) or zizmor (static) | block or detect | `script_injection`, `credential_exfiltration` | GH Actions injection, PPE set | medium | pending name confirmation |
+| CI/CD hardening | COSSETER (Tystahl et al., IEEE S&P 2026) — static `GITHUB_TOKEN` least-privilege inference per job; code: github.com/s3c2/cosseter | mitigate (limits blast radius; neither blocks nor detects the injection) | `script_injection`, `credential_exfiltration` via `GITHUB_TOKEN` | GH Actions injection, PPE set | medium | scored statically on workflow mutants (op_010): run COSSETER on the mutant workflow, record whether the injected step's token use exceeds the inferred MINPERMS. Not a runtime check — the harness does not execute GitHub workflows |
 | Phase isolation | Bazel hermetic build | block | ambient-state configure/compile injection | XZ, Octopus | high | heavy to retrofit onto Meson/git; lower priority |
 | Sandboxing | Docker | block | coarse phase isolation | broad | n/a | already the harness substrate; not a standalone defense |
 
@@ -51,14 +51,19 @@ produces the evidence they need.
    reads; pairs with op_013 (`file_write`) and future `source_swap` operators.
 3. **Integrity/provenance** — extend `wrap_integrity_check` from wrap pinning to
    build-output-hash provenance (in-toto-style).
-4. **CI/CD hardener and Bazel** — after the above, and after the tool-name
-   questions are resolved.
+4. **COSSETER and Bazel** — after the above. COSSETER is static and only
+   applies to workflow-file mutants (op_010), so it is scored separately from
+   the harness-run defenses.
 
-## Open questions for the advisor
+## Resolved advisor questions
 
-- "cosseter for GitHub Actions" — which tool? (StepSecurity Harden-Runner for
-  runtime egress, or zizmor for static analysis?)
-- "ebnf for network isolation" — confirm this is eBPF.
+- "cosseter for GitHub Actions" = COSSETER: *GitHub Actions Permission
+  Reduction Using Demand-Driven Static Analysis* (Tystahl, Ghebremichael,
+  Kapravelos, Enck, Muralee, Cherupattamoolayil, Bianchi, Machiry; IEEE S&P
+  2026). Purely static; no eBPF or runtime monitoring. It reduces what a
+  hijacked `GITHUB_TOKEN` can do, so we report it as a *mitigation*, separate
+  from block/detect rates.
+- "ebnf for network isolation" = eBPF (confirmed).
 
 ## Reporting
 

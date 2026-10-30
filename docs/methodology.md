@@ -26,6 +26,28 @@ detects each one. The study is organized around four research questions:
   with adversarial obfuscation difficulty, and do operators generalize to a
   held-out set of attacks they were not designed from?
 
+### Threat model
+
+Following MASC (Ami et al., 2021), which ties its mutation scopes to explicit
+adversaries, we state the attackers our operators model. *Draft; to be
+finalized with the team.*
+
+- **T1: Compromised upstream.** The attacker controls a dependency's source or
+  download mirror (event-stream, XZ's tarball, PyPI/npm packages). Operators
+  act in the `dependency_fetch` phase on wrap and package metadata.
+- **T2: Malicious contributor.** The attacker can commit to the project's build
+  scripts or build-time sources (Octopus Scanner, XZ's configure hook).
+  Operators act in `configure` and `compile` on `meson.build` and sources.
+- **T3: Compromised build/CI host.** The attacker controls the environment the
+  build or tests run in (SolarWinds, Codecov, CI injection). Operators act in
+  `test` and `package_release`, and on CI configuration.
+
+Each adversary can also be *evasive*: operator difficulty (§2.3) models how much
+effort the attacker spends hiding the change from review and from defenses.
+In every case the attacker wants the build to look normal, which is why only
+mutants that build, pass the baseline tests, and show their effect count as
+attacks (§2.5).
+
 The design mirrors the four workstreams of the proposal — taxonomy (§2.2),
 operators (§2.3), placement (§2.4), and benchmark/evaluation (§2.5–§2.7) — with
 a mutant-validity oracle (§2.5) added as the pivot between mutant generation and
@@ -145,7 +167,19 @@ oracle consumes.
 ## 2.7 Defenses Under Evaluation and Metrics
 
 The defense of record is PipelineSave: its per-phase sandbox is evaluated as a
-*blocking* defense and its build tracer as a *detecting* defense. Because a
+*blocking* defense and its phase-isolation checker as a *detecting* defense.
+The checker is Foreman (Pappas & Gazzillo, 2026), now publicly released
+(Zenodo, CC BY 4.0). Foreman runs each build phase from a JSON specification
+of the phase's command and permitted files, compares file access times before
+and after the phase, and reports accesses the specification forbids. Two
+properties shape how it is scored here: it observes **file accesses only** (not
+network requests or environment reads), and its verdict depends on the
+**specification** it is given, so we fix one specification per target, written
+from the clean build, before any mutant is run. Because detection rests on
+access times, the harness must keep access-time updates enabled for Foreman's
+runs (container filesystems commonly mount with `relatime`/`noatime`). The
+per-phase sandbox is described in the paper as planned work and is not yet
+public. Because a
 defense should be measured against independent baselines, the framework also
 runs tool-agnostic outside baselines that require neither the defense's code nor
 Docker — beginning with a wrap integrity/pinning check
@@ -184,6 +218,16 @@ first defense-coverage reading are already produced by the pipeline above.
   held-out generalization test and the planned NumPy/SciPy targets probe
   transfer. We describe this as an early systematic benchmark of its kind rather
   than claiming exhaustiveness.
+- **Dormant mutants.** A mutation can land in a file the build never reads.
+  On git, all wrap-file mutants were no-ops because the dependencies ship
+  pre-extracted, so Meson never re-reads the wraps; such mutants reach
+  `build_valid` without exercising the attack. MASC reports an analogous
+  build-level effect (multidex packaging hid most mutants from one detector).
+  We build from a tree without extracted subprojects, and report dormant
+  mutants separately rather than counting them toward defense scores.
+- **Benign output differences.** git embeds version information, so
+  `libgit-version.a` and the `git` binary differ from the baseline in every
+  mutant. The `artifact_diff` effect excludes these files.
 - **Conclusion validity.** Taxonomy labels are reproduced by a second coder and
   reported as Cohen's $\kappa$; defense comparisons include independent outside
   baselines and a benign-change false-positive corpus.
@@ -199,5 +243,10 @@ first defense-coverage reading are already produced by the pipeline above.
   collection: A review of open source software supply chain attacks. *DIMVA*.
 - Ladisa, P., Plate, H., Martinez, M., & Falleri, J. R. (2023). SoK: Taxonomy of
   Attacks on Open-Source Software Supply Chains. *IEEE S&P*.
+- Ami, A. S., Cooper, N., Kafle, K., Moran, K., Poshyvanyk, D., & Nadkarni, A.
+  (2021). Why Crypto-detectors Fail: A Systematic Evaluation of Cryptographic
+  Misuse Detection Techniques. arXiv:2107.07065.
+- Pappas, B., & Gazzillo, P. (2026). Build Code is Still Code: Finding the
+  Antidote for Pipeline Poisoning. *ICSE-NIER*. doi:10.1145/3786582.3786799
 - Schuler, D., Dallmeier, V., & Zeller, A. (2009). Efficient mutation testing by
   computing expected failures. *ISSRE*.
