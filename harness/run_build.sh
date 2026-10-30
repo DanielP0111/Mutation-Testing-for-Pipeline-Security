@@ -42,6 +42,12 @@ mkdir -p /src
 find /src -mindepth 1 -delete 2>/dev/null
 cp -a /work/target/. /src/
 rm -rf /src/build
+# Build like a release tarball: drop the checkout's .git. Otherwise git's
+# GIT-VERSION-GEN runs `git update-index --refresh` during compile, which reads
+# every tracked file (all of t/, Documentation/, ...) and stamps mutants
+# "-dirty" — noise for both Foreman's access logs and the output hashes.
+# Set KEEP_GIT_DIR=1 to keep it.
+[ -n "${KEEP_GIT_DIR:-}" ] || rm -rf /src/.git
 cd /src
 
 if [ -n "${FOREMAN_SPEC:-}" ]; then

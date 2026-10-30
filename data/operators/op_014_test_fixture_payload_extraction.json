@@ -1,0 +1,38 @@
+{
+  "id": "test_fixture_payload_extraction",
+  "name": "Compile-time payload extraction from a test fixture (XZ-style, effect-bearing)",
+  "description": "Models how the XZ Utils backdoor was delivered: the payload hides inside a test-data file that no one reviews as code, and an injected build step reads it during compilation. Appends a custom_target to the top-level meson.build that runs at compile time, reads the first bytes of a test fixture under t/, and writes them to a PWNED_fixture marker (standing in for splicing the payload into a build output). The build and tests still pass. Unlike op_005/op_013, the attack's key action (the compile phase reading a test file) happens inside the source tree, so a phase-isolation checker such as Foreman can observe it.",
+  "target_build_phase": "compile",
+  "scheme": "config_aware",
+  "mode": "append",
+  "injection_location": {
+    "file_glob": "meson.build",
+    "field": "build_hook"
+  },
+  "placeholders": {
+    "MESON_BUILD": "relative path to the meson.build being modified"
+  },
+  "attacker_values": {
+    "MARKER_ID": "git001",
+    "FIXTURE": "t/t4013/diff.whatchanged_master"
+  },
+  "template": {
+    "file_path": "{{MESON_BUILD}}",
+    "replacement_value": "custom_target('fixture_hook', output: 'fixture_hook.stamp', command: ['sh', '-c', 'head -c 64 \"$0\" > /tmp/PWNED_fixture_{{MARKER_ID}} && touch \"$1\"', meson.project_source_root() / '{{FIXTURE}}', '@OUTPUT@'], build_by_default: true)"
+  },
+  "preconditions": [
+    "project uses Meson; a custom_target with build_by_default runs during meson compile, not setup",
+    "the fixture file exists in the source tree and the clean compile phase does not read it",
+    "the build is from a release-style tree (no .git), otherwise git's version script reads every tracked file during compile and hides the read"
+  ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_fixture"
+    },
+    "requires": []
+  },
+  "source_attacks": [
+    "XZ Utils (CVE-2024-3094)"
+  ]
+}

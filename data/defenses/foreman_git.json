@@ -1,5 +1,5 @@
 {
-  "learn": true,
+  "learn": "dirs",
   "comment": "No permissions given, so run_pipeline.py --foreman learns them from the clean git build: each phase (fetch, setup, compile, test) is restricted from every top-level entry of the source tree it did not touch. The learned spec is written to <out>/foreman_spec_learned.json.",
   "phases": {}
 }

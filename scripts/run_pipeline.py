@@ -117,13 +117,26 @@ def run(target: str, operators_dir: str, out_dir: str,
         if foreman:
             spec = foreman_spec.load_spec(foreman)
             if foreman_spec.needs_learning(spec):
-                learned = foreman_spec.learn_from_info(baseline_dir / "foreman_info.txt", target_root)
+                gran = foreman_spec.learn_granularity(spec)
+                learned = foreman_spec.learn_from_info(baseline_dir / "foreman_info.txt",
+                                                       target_root, granularity=gran)
                 foreman = str((out_root / "foreman_spec_learned.json").resolve())
                 Path(foreman).write_text(json.dumps(learned, indent=2), encoding="utf-8")
-                print(f"foreman: learned phase permissions from the clean build -> {foreman}")
+                print(f"foreman: learned {gran}-level phase permissions from the clean build -> {foreman}")
             else:
                 foreman = str(Path(foreman).resolve())
-            print(f"foreman: clean-build warnings under this spec are checked per mutant run")
+            # False-positive check: rebuild the CLEAN target under the final spec.
+            # Its warnings are noise (not attacks); they are reported and
+            # subtracted from every mutant's warnings.
+            fp_dir = out_root / "_foreman_clean_check"
+            if not (fp_dir / "status.json").exists():
+                print("foreman: rebuilding the clean target under the spec to measure false positives...")
+                run_in_harness(str(target_root), str(fp_dir), tests=tests,
+                               wrap_mode=wrap_mode, foreman_spec=foreman)
+            fp_run = load_run(str(fp_dir))
+            baseline_run["foreman_warnings"] = fp_run.get("foreman_warnings", [])
+            print(f"foreman: {len(baseline_run['foreman_warnings'])} warning(s) on the clean rebuild "
+                  f"(false positives; see {fp_dir}/foreman_warnings.txt)")
 
     for operator in operators:
         candidates = placement_find_candidates(parsed, operator)

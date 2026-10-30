@@ -1,0 +1,5 @@
+{
+  "learn": "files",
+  "comment": "File-level policy learned from the clean git build: each phase may touch exactly the source files it touched in the clean build, plus build/. Any other file a phase touches is a warning.",
+  "phases": {}
+}

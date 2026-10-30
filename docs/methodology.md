@@ -225,9 +225,15 @@ first defense-coverage reading are already produced by the pipeline above.
   build-level effect (multidex packaging hid most mutants from one detector).
   We build from a tree without extracted subprojects, and report dormant
   mutants separately rather than counting them toward defense scores.
-- **Benign output differences.** git embeds version information, so
-  `libgit-version.a` and the `git` binary differ from the baseline in every
-  mutant. The `artifact_diff` effect excludes these files.
+- **Building from a VCS checkout.** The git target is a git checkout with a
+  `.git` directory. git's version script then runs `git update-index --refresh`
+  during compile, which reads every tracked file (all of `t/` and
+  `Documentation/`) and stamps any modified tree `-dirty`. This made every
+  mutant's `libgit-version.a` and `git` binary differ from the baseline, and
+  made the compile phase appear to read the whole tree, hiding XZ-style reads
+  of test fixtures from a phase-isolation checker. The harness therefore builds
+  release-style trees (the `.git` directory is removed before building), as a
+  user building from a release tarball would.
 - **Conclusion validity.** Taxonomy labels are reproduced by a second coder and
   reported as Cohen's $\kappa$; defense comparisons include independent outside
   baselines and a benign-change false-positive corpus.

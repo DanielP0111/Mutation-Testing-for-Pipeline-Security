@@ -27,3 +27,20 @@ def test_build_phases_use_harness_steps():
     assert phases[2]["commands"] == [["bash", "/work/harness/step.sh", "compile"]]
     assert phases[2]["permissions"]["file"]["restricted"] == ["/src/t/"]
     assert "permissions" not in phases[0]
+
+
+def test_learn_files_permits_exactly_touched_files(tmp_path: Path):
+    (tmp_path / "src").mkdir()
+    (tmp_path / "t").mkdir()
+    info = tmp_path / "info.txt"
+    info.write_text(
+        "compile accessed /src/src/a.c\n"
+        "compile accessed /src/src\n"          # directory: ignored
+        "compile created /src/build/a.o\n"     # build/: permitted wholesale
+        "test accessed /src/t/t0000-basic.sh\n"
+    )
+    spec = fs.learn_from_info(info, tmp_path, granularity="files")
+    compile_p = spec["phases"]["compile"]["file"]["permitted"]
+    assert compile_p == ["/src/src/a.c", "/src/build/", "/src/build_phases.json"]
+    assert "/src/t/t0000-basic.sh" in spec["phases"]["test"]["file"]["permitted"]
+    assert fs.learn_granularity({"learn": "files"}) == "files"

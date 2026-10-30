@@ -37,6 +37,32 @@ def _safe_is_file_in_any_paths(file, paths):
         return any(f == p.absolute() or p.absolute() in f.parents for p in paths)
 
 
-fm.is_file_in_any_paths = _safe_is_file_in_any_paths
+# Shim 3 (speed only): the original walks every listed directory with rglob()
+# for every touched file, which is O(touched x listed) and takes hours with a
+# file-level policy on git. This equivalent check (same path or inside a listed
+# directory; no symlinks in the build tree) gives the same answer in O(1).
+# FOREMAN_EXACT=1 keeps the original.
+_index: dict[int, tuple[set, list]] = {}
+
+
+def _fast_is_file_in_any_paths(file, paths):
+    key = id(paths)
+    if key not in _index:
+        exact, dirs = set(), []
+        for p in paths:
+            ap = os.path.abspath(str(p))
+            exact.add(ap)
+            if os.path.isdir(ap):
+                dirs.append(ap.rstrip("/") + "/")
+        _index[key] = (exact, dirs)
+    exact, dirs = _index[key]
+    f = os.path.abspath(str(file))
+    return f in exact or any(f.startswith(d) for d in dirs)
+
+
+if os.environ.get("FOREMAN_EXACT"):
+    fm.is_file_in_any_paths = _safe_is_file_in_any_paths
+else:
+    fm.is_file_in_any_paths = _fast_is_file_in_any_paths
 
 sys.exit(fm.main())
