@@ -80,10 +80,13 @@ def run(target: str, operators_dir: str, out_dir: str,
         validate: bool, use_reference: bool,
         harness: bool = False, baseline: str | None = None, runs: int = 3,
         tests=DEFAULT_TESTS, wrap_mode: str | None = None,
-        defenses: list[str] | None = None) -> list[dict]:
+        defenses: list[str] | None = None,
+        only: set[str] | None = None) -> list[dict]:
     target_root = Path(target).resolve()
     parsed = parse_project(str(target_root))
     operators = load_operators(operators_dir)
+    if only:
+        operators = [o for o in operators if o.get("id") in only]
     out_root = Path(out_dir)
     out_root.mkdir(parents=True, exist_ok=True)
 
@@ -182,13 +185,27 @@ def main() -> int:
     ap.add_argument("--defense", action="append", default=[], metavar="NAME",
                     help="static defense to run against each mutant (repeatable); "
                          "available: " + (", ".join(available_defenses()) or "none"))
+    ap.add_argument("--only", action="append", default=[], metavar="OP",
+                    help="run only this operator (file prefix like op_013, or its id); repeatable")
     args = ap.parse_args()
+
+    only = set()
+    for tok in args.only:
+        for f in sorted(Path(args.operators).glob("*.json")):
+            try:
+                op_id = json.loads(f.read_text(encoding="utf-8")).get("id")
+            except (OSError, json.JSONDecodeError):
+                continue
+            if f.name.startswith(tok) or op_id == tok:
+                only.add(op_id)
+    if args.only and not only:
+        raise SystemExit(f"--only matched no operator in {args.operators}: {', '.join(args.only)}")
 
     results = run(args.target, args.operators, args.out,
                   args.validate, args.reference_placement,
                   harness=args.harness, baseline=args.baseline, runs=args.runs,
                   tests=tuple(args.tests.split()), wrap_mode=args.wrap_mode,
-                  defenses=args.defense)
+                  defenses=args.defense, only=only or None)
 
     applied = sum(1 for r in results if r["applied"])
     valid = sum(1 for r in results
