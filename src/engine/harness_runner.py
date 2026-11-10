@@ -11,12 +11,49 @@ Requires Docker and the harness image:
 
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 HARNESS_DIR = REPO_ROOT / "harness"
 DEFAULT_IMAGE = "pipeline-harness"
 DEFAULT_TESTS = ("t0000-basic", "t0001-init", "t1007-hash-object", "t-hash")
+
+
+def check_docker(image: str = DEFAULT_IMAGE, timeout: int = 15) -> None:
+    """
+    Fail fast if the harness cannot run: Docker CLI missing, daemon unreachable
+    (Docker Desktop closed), or the harness image not built.
+
+    Without this, every `docker run` fails, every run dir loads empty, and the
+    classifier scores every mutant setup_failed with "0 false positives" -- a
+    run that looks successful but is garbage (seen Oct 30). Exits the process
+    with a clear message instead.
+    """
+    def fail(msg: str) -> None:
+        sys.exit(f"ERROR: {msg}")
+
+    try:
+        info = subprocess.run(["docker", "info", "--format", "{{.ServerVersion}}"],
+                              capture_output=True, text=True, timeout=timeout)
+    except FileNotFoundError:
+        fail("docker not found on PATH. Install Docker Desktop and retry.")
+    except subprocess.TimeoutExpired:
+        fail(f"`docker info` did not answer within {timeout}s. "
+             "Is Docker Desktop still starting? Wait for it and retry.")
+    if info.returncode != 0:
+        detail = (info.stderr or info.stdout).strip().splitlines()
+        fail("Docker is not reachable. Start Docker Desktop and retry."
+             + (f"\n  docker info: {detail[-1]}" if detail else ""))
+
+    try:
+        img = subprocess.run(["docker", "image", "inspect", image],
+                             capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        fail(f"`docker image inspect {image}` timed out.")
+    if img.returncode != 0:
+        fail(f"harness image '{image}' not found. Build it first:\n"
+             f"  docker build -t {image} harness/")
 
 
 def run_in_harness(

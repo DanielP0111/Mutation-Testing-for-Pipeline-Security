@@ -43,7 +43,7 @@ sys.path.insert(0, str(REPO_ROOT))
 from src.parser import parse_project
 from src.engine import load_operators, fill_template, generate_mutant
 from src.engine.validator import validate_mutant, classify_runs
-from src.engine.harness_runner import run_in_harness, load_run, DEFAULT_TESTS
+from src.engine.harness_runner import run_in_harness, load_run, DEFAULT_TESTS, check_docker
 from src.engine import foreman_spec
 from src.engine.reference_placement import reference_find_candidates
 from src.placement import find_candidates as placement_find_candidates
@@ -231,6 +231,9 @@ def main() -> int:
     ap.add_argument("--only", action="append", default=[], metavar="OP",
                     help="run only this operator (file prefix like op_013, or its id); repeatable")
     args = ap.parse_args()
+
+    if args.harness:
+        check_docker()  # fail fast: a dead daemon would score every mutant setup_failed
 
     only = set()
     for tok in args.only:

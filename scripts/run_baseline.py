@@ -26,7 +26,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from src.engine.harness_runner import run_in_harness, DEFAULT_TESTS
+from src.engine.harness_runner import run_in_harness, DEFAULT_TESTS, check_docker
 
 
 def main() -> int:
@@ -40,6 +40,7 @@ def main() -> int:
     ap.add_argument("--repeat", type=int, default=1,
                     help="extra runs go to <out>_run2, _run3... and hashes are compared")
     args = ap.parse_args()
+    check_docker()
 
     out = Path(args.out)
     outs = [out] + [out.with_name(f"{out.name}_run{i}") for i in range(2, args.repeat + 1)]
