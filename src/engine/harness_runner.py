@@ -52,7 +52,8 @@ def check_docker(image: str = DEFAULT_IMAGE, timeout: int = 15) -> None:
         fail("docker not found on PATH. Install Docker Desktop and retry.")
     except subprocess.TimeoutExpired:
         fail(f"`docker info` did not answer within {timeout}s. "
-             "Is Docker Desktop still starting? Wait for it and retry.")
+             "Docker Desktop may be starting or shutting down; wait until it "
+             "is fully up and retry.")
     if info.returncode != 0:
         detail = (info.stderr or info.stdout).strip().splitlines()
         fail("Docker is not reachable. Start Docker Desktop and retry."
