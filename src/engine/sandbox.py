@@ -44,7 +44,8 @@ import uuid
 from pathlib import Path
 
 from src.engine.harness_runner import (DEFAULT_IMAGE, DEFAULT_TESTS, DOCKER_INFRA_RCS,
-                                       HARNESS_DIR, HarnessUnavailable, load_run)
+                                       HARNESS_DIR, HarnessUnavailable, build_env_args,
+                                       load_run)
 from src.engine.validator import check_effect
 
 PHASES = ("fetch", "setup", "compile", "test")
@@ -54,7 +55,8 @@ BUILDER_CAPS = ("CHOWN", "DAC_OVERRIDE", "FOWNER", "SETUID", "SETGID", "KILL")
 
 
 def phase_cmd(step: str, *, volume: str, src: Path, out: Path, policy_path: Path | None,
-              tests, wrap_mode, image: str, network: bool, name: str) -> list[str]:
+              tests, wrap_mode, image: str, network: bool, name: str,
+              build_env: dict | None = None) -> list[str]:
     """docker run command for one sandbox step (exposed for tests)."""
     cmd = ["docker", "run", "--rm", "--name", name]
     if not network:
@@ -67,6 +69,7 @@ def phase_cmd(step: str, *, volume: str, src: Path, out: Path, policy_path: Path
             "-e", f"TESTS={' '.join(tests)}"]
     if wrap_mode:
         cmd += ["-e", f"WRAP_MODE={wrap_mode}"]
+    cmd += build_env_args(build_env)
     cmd += ["-v", f"{volume}:/src",
             "-v", f"{HARNESS_DIR}:/work/harness:ro",
             "-v", f"{out}:/work/out"]
@@ -81,7 +84,7 @@ def phase_cmd(step: str, *, volume: str, src: Path, out: Path, policy_path: Path
 def run_in_sandbox(source_dir: str, out_dir: str, *, policy: dict | None = None,
                    tests=DEFAULT_TESTS, wrap_mode: str | None = None,
                    image: str = DEFAULT_IMAGE, timeout: int = 3600,
-                   network_phases=()) -> dict:
+                   network_phases=(), build_env: dict | None = None) -> dict:
     """
     Build and test `source_dir` phase by phase in the sandbox; return
     load_sandbox_run(out_dir). policy=None runs in LEARN mode.
@@ -107,7 +110,7 @@ def run_in_sandbox(source_dir: str, out_dir: str, *, policy: dict | None = None,
             name = f"pmt-sbx-{tag}-{step}"
             cmd = phase_cmd(step, volume=volume, src=src, out=out, policy_path=policy_path,
                             tests=tests, wrap_mode=wrap_mode, image=image,
-                            network=step in network_phases, name=name)
+                            network=step in network_phases, name=name, build_env=build_env)
             try:
                 proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
             except subprocess.TimeoutExpired:

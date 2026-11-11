@@ -16,7 +16,7 @@
 # Mounts:  /src volume (shared) | /work/harness ro | /work/out results (root)
 #          /work/target ro (prepare only) | /work/policy.json ro (enforce only;
 #          absent = LEARN mode: all of /src writable, writes are recorded)
-# Env:     TESTS, WRAP_MODE (as harness/run_build.sh)
+# Env:     TESTS, WRAP_MODE, SETUP_ARGS, FETCH_SUBPROJECTS (as harness/run_build.sh)
 #
 # Per phase it writes to /work/out:
 #   <phase>.log/.rc (and hashes.txt, testlog.json, tests.log for test)
@@ -94,6 +94,7 @@ as_builder() {
     env -i PATH="$PATH" HOME=/tmp/home OUT="$PHASE_OUT" \
         CANARY_SECRET="CANARY_SECRET_7f3a91" \
         TESTS="${TESTS:-}" WRAP_MODE="${WRAP_MODE:-}" SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-}" \
+        SETUP_ARGS="${SETUP_ARGS:-}" FETCH_SUBPROJECTS="${FETCH_SUBPROJECTS:-}" \
         "$@"
 }
 as_builder bash /work/harness/step.sh "$PHASE"
