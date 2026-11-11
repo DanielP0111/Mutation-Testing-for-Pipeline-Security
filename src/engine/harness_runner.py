@@ -184,4 +184,32 @@ def load_run(out_dir: str) -> dict:
         "markers": [l for l in read("markers.txt").splitlines() if l.strip()],
         "requests": [l for l in read("mock_server.log").splitlines() if l.strip()],
         "foreman_warnings": [l for l in read("foreman_warnings.txt").splitlines() if l.strip()],
+        "subprojects": parse_subprojects(read("setup.log")),
     }
+
+
+def parse_subprojects(setup_log: str) -> dict:
+    """
+    The "Subprojects" block of Meson's configure summary, e.g.
+
+          Subprojects
+            curl     : YES
+            openssl  : NO Missing key 'source_hash' in openssl.wrap
+
+    -> {"curl": "YES", "openssl": "NO Missing key ..."}. Empty if absent.
+    The last block wins (the top-level project's summary is printed last).
+    """
+    out: dict = {}
+    lines = setup_log.splitlines()
+    for i, line in enumerate(lines):
+        if line.strip() != "Subprojects":
+            continue
+        block = {}
+        for nxt in lines[i + 1:]:
+            if not nxt.strip() or ":" not in nxt:
+                break
+            name, _, status = nxt.partition(":")
+            block[name.strip()] = status.strip()
+        if block:
+            out = block
+    return out
