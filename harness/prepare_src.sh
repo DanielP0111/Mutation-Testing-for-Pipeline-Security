@@ -22,6 +22,9 @@ rm -rf /src/build
 if [ -z "${KEEP_EXTRACTED_SUBPROJECTS:-}" ]; then
   for w in /src/subprojects/*.wrap; do
     [ -f "$w" ] || continue
+    # Only [wrap-file] wraps come back from packagecache; a [wrap-git] wrap's
+    # directory may be vendored in the tree (GLib's gvdb), so leave it alone.
+    grep -q '^\[wrap-file\]' "$w" || continue
     d=$(sed -n 's/^[[:space:]]*directory[[:space:]]*=[[:space:]]*//p' "$w" | head -1)
     case "$d" in ""|*/*|.|..) ;; *) rm -rf "/src/subprojects/$d" ;; esac
   done

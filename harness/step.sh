@@ -15,11 +15,13 @@ rc_of() { cat "$OUT/$1.rc" 2>/dev/null || echo -1; }
 
 case "$STEP" in
   fetch)
-    meson subprojects download > "$OUT/fetch.log" 2>&1
+    # shellcheck disable=SC2086
+    meson subprojects download ${FETCH_SUBPROJECTS:-} > "$OUT/fetch.log" 2>&1
     echo $? > "$OUT/fetch.rc"
     ;;
   setup)
-    meson setup build --buildtype=release ${WRAP_MODE:+--wrap-mode=$WRAP_MODE} \
+    # shellcheck disable=SC2086
+    meson setup build --buildtype=release ${WRAP_MODE:+--wrap-mode=$WRAP_MODE} ${SETUP_ARGS:-} \
       > "$OUT/setup.log" 2>&1
     echo $? > "$OUT/setup.rc"
     ;;
@@ -39,7 +41,11 @@ case "$STEP" in
     ;;
   test)
     if [ "$(rc_of compile)" != 0 ]; then echo -1 > "$OUT/test.rc"; exit 0; fi
-    find build -type f \( -name 'git' -o -name '*.a' -o -name '*.so' \) \
+    # Build outputs: git's binary, static libs, shared libs incl. versioned
+    # ones (GLib: libglib-2.0.so.0.8000.0); not Meson's private *.p/ dirs or
+    # the *-gdb.py helpers next to versioned libs.
+    find build -type f \( -name 'git' -o -name '*.a' -o -name '*.so' -o -name '*.so.[0-9]*' \) \
+      ! -path '*.p/*' ! -name '*.py' \
       -exec sha256sum {} + | sort -k2 > "$OUT/hashes.txt"
     if [ -n "${TESTS:-}" ]; then
       # shellcheck disable=SC2086

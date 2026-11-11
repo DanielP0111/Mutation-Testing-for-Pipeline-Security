@@ -32,6 +32,27 @@ class HarnessUnavailable(RuntimeError):
     """The container never ran, so there are no results to record."""
 
 
+# Per-target build settings passed to harness/step.sh (see build_env_args).
+BUILD_ENV_KEYS = ("SETUP_ARGS", "FETCH_SUBPROJECTS")
+
+
+def build_env_args(build_env: dict | None) -> list[str]:
+    """
+    docker -e flags for per-target build settings:
+      SETUP_ARGS         extra `meson setup` arguments, e.g.
+                         "--force-fallback-for=pcre2,zlib" (GLib)
+      FETCH_SUBPROJECTS  subprojects for `meson subprojects download`
+                         (default: all), e.g. "pcre2 zlib"
+    """
+    out = []
+    for k, v in (build_env or {}).items():
+        if k not in BUILD_ENV_KEYS:
+            raise ValueError(f"unknown build_env key {k!r}; expected one of {BUILD_ENV_KEYS}")
+        if v:
+            out += ["-e", f"{k}={v}"]
+    return out
+
+
 def check_docker(image: str = DEFAULT_IMAGE, timeout: int = 15) -> None:
     """
     Fail fast if the harness cannot run: Docker CLI missing, daemon unreachable
@@ -79,6 +100,7 @@ def run_in_harness(
     image: str = DEFAULT_IMAGE,
     timeout: int = 3600,
     foreman_spec: str | None = None,
+    build_env: dict | None = None,
 ) -> dict:
     """
     Build and test `source_dir` in the harness container; return load_run(out_dir).
@@ -97,6 +119,7 @@ def run_in_harness(
     cmd += ["-e", f"TESTS={' '.join(tests)}"]
     if wrap_mode:
         cmd += ["-e", f"WRAP_MODE={wrap_mode}"]
+    cmd += build_env_args(build_env)
     if foreman_spec:
         # Foreman decides "accessed" from file access times, so /src must record
         # every read: a tmpfs mounted with strictatime (Docker's default overlay

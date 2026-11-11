@@ -121,3 +121,20 @@ def test_run_in_sandbox_aborts_when_docker_dies(tmp_path):
     # the volume is still removed
     assert any(c.args[0][:3] == ["docker", "volume", "rm"] for c in m.call_args_list)
     assert not (tmp_path / "out" / "status.json").exists()
+
+
+def test_build_env_reaches_docker(tmp_path):
+    kw = dict(volume="v", src=tmp_path, out=tmp_path, policy_path=None, tests=(),
+              wrap_mode=None, image="img", name="n", network=False)
+    env = {"SETUP_ARGS": "--force-fallback-for=pcre2,zlib", "FETCH_SUBPROJECTS": "pcre2 zlib"}
+    c = sbx.phase_cmd("setup", build_env=env, **kw)
+    assert "SETUP_ARGS=--force-fallback-for=pcre2,zlib" in c
+    assert "FETCH_SUBPROJECTS=pcre2 zlib" in c
+    assert not any(a.startswith("SETUP_ARGS") for a in sbx.phase_cmd("setup", **kw))
+
+
+def test_build_env_rejects_unknown_keys():
+    from src.engine.harness_runner import build_env_args
+    with pytest.raises(ValueError, match="unknown build_env key"):
+        build_env_args({"PATH": "/evil"})
+    assert build_env_args({"SETUP_ARGS": None}) == []

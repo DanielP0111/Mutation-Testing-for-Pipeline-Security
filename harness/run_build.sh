@@ -11,6 +11,8 @@
 # Env:
 #   TESTS         space-separated meson test names to run (empty = skip tests)
 #   WRAP_MODE     optional meson --wrap-mode (e.g. forcefallback)
+#   SETUP_ARGS    optional extra meson setup args (e.g. --force-fallback-for=pcre2,zlib)
+#   FETCH_SUBPROJECTS  optional subprojects to download (default: all)
 #   FOREMAN_SPEC  optional path to a Foreman phase spec; when set, the four
 #                 steps run as Foreman build phases (see harness/step.sh) and
 #                 /src must be mounted with strictatime (harness_runner does it)

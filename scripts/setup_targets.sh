@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # scripts/setup_targets.sh
 #
-# Clone the three target Meson projects at pinned versions into data/targets/.
+# Clone the target Meson projects at pinned versions into data/targets/.
 # Safe to re-run — skips any project that already has files present.
 #
 # Usage:
@@ -11,9 +11,12 @@
 #   git (any recent version)
 #
 # Target projects:
-#   numpy  — NumPy v2.0.0  (migrated to Meson in 1.25; many .wrap files)
-#   scipy  — SciPy v1.14.0 (migrated to Meson in 1.9;  many .wrap files)
-#   gnome  — GLib v2.80.0  (mature Meson project; platform .wrap files)
+#   git    — Git v2.48.0   (primary target; 5 .wrap files)
+#   numpy  — NumPy v2.0.0  (Meson, but NO .wrap files; needs its vendored Meson fork + Cython)
+#   scipy  — SciPy v1.14.0 (Meson, but NO .wrap files)
+#   gnome-glib — GLib 2.80.0 (second target; plain C; wrap-file: pcre2, zlib;
+#                the rest are wrap-git). Build with
+#                --setup-args=--force-fallback-for=pcre2,zlib --fetch-subprojects='pcre2 zlib'
 
 set -euo pipefail
 
@@ -34,14 +37,28 @@ clone_at_tag() {
     fi
 
     echo "[clone] ${name} @ ${tag} → ${dest}"
+    # NumPy and SciPy vendor parts of their build (incl. NumPy's Meson fork)
+    # as git submodules; without them the tree does not configure.
     git clone \
         --depth 1 \
         --branch "${tag}" \
         --single-branch \
+        --recurse-submodules --shallow-submodules \
         "${url}" \
         "${dest}"
     echo "[done]  ${name}"
 }
+
+# ---------------------------------------------------------------------------
+# Git v2.48.0  (primary target)
+# Wrap files:  git/subprojects/*.wrap. The harness builds offline, so after
+# cloning, fill the package cache once (needs meson + network):
+#   (cd data/targets/git && meson subprojects download)
+# ---------------------------------------------------------------------------
+clone_at_tag \
+    "git" \
+    "https://github.com/git/git.git" \
+    "v2.48.0"
 
 # ---------------------------------------------------------------------------
 # NumPy v2.0.0
