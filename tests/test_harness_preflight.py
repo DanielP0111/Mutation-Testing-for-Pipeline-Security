@@ -45,3 +45,25 @@ def test_exits_when_image_missing():
                            side_effect=[_proc(0, "27.0.3"), _proc(1, err="No such image")]):
         with pytest.raises(SystemExit, match="docker build -t pipeline-harness harness/"):
             check_docker()
+
+
+# --- mid-run guard: Docker dies after the preflight passed ------------------
+
+@pytest.mark.parametrize("rc", [125, 126, 127])
+def test_run_in_harness_raises_when_container_never_ran(tmp_path, rc):
+    err = "docker: Error response from daemon: connection refused."
+    with mock.patch.object(harness_runner.subprocess, "run", return_value=_proc(rc, err=err)):
+        with pytest.raises(harness_runner.HarnessUnavailable, match=f"exited {rc}"):
+            harness_runner.run_in_harness(str(tmp_path), str(tmp_path / "out"))
+    # Nothing a later rerun would mistake for a finished result.
+    assert not (tmp_path / "out" / "status.json").exists()
+
+
+def test_run_in_harness_records_build_failures_normally(tmp_path):
+    # rc 1 = run_build.sh ran and something failed: that IS a result.
+    out = tmp_path / "out"
+    out.mkdir()
+    (out / "status.json").write_text('{"fetch_rc": 0, "setup_rc": 1, "compile_rc": -1, "test_rc": -1}')
+    with mock.patch.object(harness_runner.subprocess, "run", return_value=_proc(1)):
+        run = harness_runner.run_in_harness(str(tmp_path), str(out))
+    assert run["status"]["setup_rc"] == 1

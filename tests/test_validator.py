@@ -188,7 +188,7 @@ class TestLoadRun:
     def test_empty_dir_loads_as_empty(self, tmp_path):
         run = load_run(str(tmp_path))
         assert run == {"status": {}, "hashes": {}, "tests": {},
-                       "markers": [], "requests": []}
+                       "markers": [], "requests": [], "foreman_warnings": []}
 
 
 # ===========================================================================

@@ -20,6 +20,18 @@ DEFAULT_IMAGE = "pipeline-harness"
 DEFAULT_TESTS = ("t0000-basic", "t0001-init", "t1007-hash-object", "t-hash")
 
 
+# `docker run` exit codes that mean the harness itself never ran, as opposed to
+# a build that ran and failed: 125 = Docker daemon error (daemon died, image
+# gone, bad mount), 126 = container command could not be invoked, 127 = command
+# not found in the image.
+DOCKER_INFRA_RCS = {125: "Docker daemon error", 126: "command not invokable",
+                    127: "command not found in image"}
+
+
+class HarnessUnavailable(RuntimeError):
+    """The container never ran, so there are no results to record."""
+
+
 def check_docker(image: str = DEFAULT_IMAGE, timeout: int = 15) -> None:
     """
     Fail fast if the harness cannot run: Docker CLI missing, daemon unreachable
@@ -104,9 +116,22 @@ def run_in_harness(
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
         (out / "docker.log").write_text(proc.stdout + proc.stderr, encoding="utf-8")
     except FileNotFoundError:
-        raise RuntimeError("docker not found on PATH; is Docker Desktop running?")
+        raise HarnessUnavailable("docker not found on PATH; is Docker Desktop running?")
     except subprocess.TimeoutExpired:
         (out / "docker.log").write_text(f"timed out after {timeout}s", encoding="utf-8")
+    else:
+        if proc.returncode in DOCKER_INFRA_RCS:
+            # Mid-run guard: Docker died (or the image broke) after the
+            # preflight passed. This run dir would load empty and be scored
+            # setup_failed, so stop the whole run instead of recording it.
+            # status.json is never written here, so a rerun redoes this dir.
+            tail = (proc.stderr or proc.stdout).strip().splitlines()
+            raise HarnessUnavailable(
+                f"docker run exited {proc.returncode} "
+                f"({DOCKER_INFRA_RCS[proc.returncode]}) for {src} -> {out}; "
+                "the harness did not run, so nothing was recorded. "
+                "Check Docker Desktop and rerun."
+                + (f"\n  docker: {tail[-1]}" if tail else ""))
 
     return load_run(str(out))
 
