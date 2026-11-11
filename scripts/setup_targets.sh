@@ -85,9 +85,10 @@ clone_at_tag \
 # Meson build: gnome-glib/meson.build
 # Wrap files:  gnome-glib/subprojects/*.wrap
 # ---------------------------------------------------------------------------
+# Official GitHub mirror: gitlab.gnome.org rejects scripted clones (HTTP 406).
 clone_at_tag \
     "gnome-glib" \
-    "https://gitlab.gnome.org/GNOME/glib.git" \
+    "https://github.com/GNOME/glib.git" \
     "2.80.0"
 
 echo ""
