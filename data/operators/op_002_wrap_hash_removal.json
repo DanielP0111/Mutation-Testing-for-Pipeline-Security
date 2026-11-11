@@ -23,5 +23,12 @@
   ],
   "source_attacks": [
     "XZ Utils (CVE-2024-3094)"
-  ]
+  ],
+  "effect": {
+    "observable": "feature_disabled",
+    "check": {
+      "wrap_file": "{{WRAP_FILE}}"
+    },
+    "requires": []
+  }
 }

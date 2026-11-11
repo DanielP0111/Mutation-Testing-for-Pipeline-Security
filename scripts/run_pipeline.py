@@ -41,6 +41,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 from src.parser import parse_project
+from src.engine.template_filler import resolve_effect
 from src.engine import load_operators, fill_template, generate_mutant
 from src.engine.validator import validate_mutant, classify_runs
 from src.engine.harness_runner import run_in_harness, load_run, DEFAULT_TESTS, check_docker
@@ -201,7 +202,7 @@ def run(target: str, operators_dir: str, out_dir: str,
                 record["validation"] = {"status": "skipped", "setup_ok": False,
                                         "returncode": None, "log_tail": ""}
 
-            effect = operator.get("effect")
+            effect = resolve_effect(operator, candidate)
             if harness and record["applied"]:
                 # Run outputs live outside the mutant dir so later runs
                 # don't copy earlier results into the build.
