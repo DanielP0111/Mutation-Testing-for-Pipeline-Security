@@ -27,6 +27,44 @@ maps directly onto them:
 Status: Foreman is public (Zenodo 10.5281/zenodo.18233614; code Apache-2.0), vendored in `third_party/foreman/` and wired into the harness (`run_pipeline.py --foreman`). The `systemd-nspawn` sandbox is still planned work in the paper; waiting on that code from Kevin
 (reminder sent). Until then, only the outside baselines below are runnable.
 
+## Our per-phase isolation sandbox (`run_pipeline.py --sandbox`)
+
+Our own enforcing defense (not PipelineSave's sandbox; never call it that).
+Code: `src/engine/sandbox.py`, `harness/sandbox_phase.sh`.
+
+- One container per `step.sh` phase (fetch, setup, compile, test), `--network none`,
+  a private tmpfs `/tmp` discarded when the phase ends, all capabilities dropped for
+  the build step, which runs as the unprivileged `builder` user.
+- `/src` (a Docker volume, the only state shared between phases) is root-owned and
+  read-only to the build, except `build/` and what the learned policy permits: the
+  files the phase rewrote in the clean build, and new entries in the directories it
+  created entries in.
+- Policy learned from a clean LEARN-mode build (all of `/src` writable, writes
+  recorded per phase). False-positive check: the clean target is rebuilt under the
+  policy and must pass every test, or the run stops.
+
+Scoring (on effective mutants), comparing against the clean sandboxed build:
+
+| Outcome | Meaning | Blocked? |
+| --- | --- | --- |
+| prevented | effect never observed, not even inside a phase (payload could not run or failed, e.g. a write to `/src` was denied) | yes |
+| confined | effect observed inside a phase only (e.g. op_005's `/tmp/PWNED_*`, an exfil request with no network) and discarded with it | yes |
+| not_blocked | effect escaped the phase and the oracle saw it | no |
+
+"Blocked" = the declared effect is not observed by the oracle outside the phase.
+Confined is not prevention: the payload ran and could read anything its phase
+could (source, the canary in its environment). Report the two separately.
+
+Network: the mock attacker still runs inside each phase so attempts are visible,
+but a request only counts as escaped from phases given network
+(`--sandbox-network-phase`, default none). So with the default, every
+network/exfil effect is at best confined by construction; say so in the paper.
+
+Known gap: `build/` must carry over between phases, so state hidden there
+(write in setup, read in compile; an output dropped into `build/`) gets
+through. Foreman's file-level policy also permits `build/`, so neither defense
+covers it.
+
 ## Outside baselines (no PipelineSave code required)
 
 These are independent, tool-agnostic defenses used to contextualize
