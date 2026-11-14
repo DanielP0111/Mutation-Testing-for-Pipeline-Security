@@ -75,3 +75,30 @@ def fill_template(operator: dict, candidate: dict) -> dict:
         "scheme":            candidate.get("scheme", operator.get("scheme", "")),
         "difficulty":        candidate.get("difficulty", 1),
     }
+
+
+def resolve_effect(operator: dict, candidate: dict) -> dict | None:
+    """
+    The operator's "effect" block with {{PLACEHOLDER}}s in its check values
+    resolved from the same sources as fill_template(), so an effect can name
+    the exact thing this mutant targets (e.g. op_002's wrap file). Unresolved
+    placeholders raise ValueError, as in fill_template().
+    """
+    effect = operator.get("effect")
+    if not effect:
+        return effect
+    values = {**operator.get("attacker_values", {}), **candidate.get("placeholder_map", {})}
+
+    def res(v):
+        if isinstance(v, list):
+            return [res(x) for x in v]
+        if not isinstance(v, str):
+            return v
+        for k, real in values.items():
+            v = v.replace(f"{{{{{k}}}}}", str(real))
+        left = re.findall(r"\{\{[^}]+\}\}", v)
+        if left:
+            raise ValueError(f"Unresolved placeholders in effect: {left}")
+        return v
+
+    return {**effect, "check": {k: res(v) for k, v in (effect.get("check") or {}).items()}}

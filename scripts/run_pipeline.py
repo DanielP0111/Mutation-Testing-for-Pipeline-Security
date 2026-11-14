@@ -41,10 +41,12 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 from src.parser import parse_project
+from src.engine.template_filler import resolve_effect
 from src.engine import load_operators, fill_template, generate_mutant
 from src.engine.validator import validate_mutant, classify_runs
 from src.engine.harness_runner import run_in_harness, load_run, DEFAULT_TESTS, check_docker
 from src.engine import foreman_spec
+from src.engine import sandbox as sbx
 from src.engine.reference_placement import reference_find_candidates
 from src.placement import find_candidates as placement_find_candidates
 from src.engine.defense_runner import (
@@ -68,7 +70,7 @@ def _unified_diff(original_root: Path, mutant_rec: dict) -> str:
 
 
 def _load_or_run_baseline(target_root: Path, baseline_dir: Path, tests, wrap_mode,
-                          foreman_spec: str | None = None) -> dict:
+                          foreman_spec: str | None = None, build_env=None) -> dict:
     """Reuse an existing baseline run if one is there; otherwise build it now."""
     if (baseline_dir / "status.json").exists():
         if foreman_spec and not (baseline_dir / "foreman_info.txt").exists():
@@ -79,7 +81,44 @@ def _load_or_run_baseline(target_root: Path, baseline_dir: Path, tests, wrap_mod
     print(f"no baseline in {baseline_dir}; building clean target in the harness"
           + (" under Foreman" if foreman_spec else "") + "...")
     return run_in_harness(str(target_root), str(baseline_dir),
-                          tests=tests, wrap_mode=wrap_mode, foreman_spec=foreman_spec)
+                          tests=tests, wrap_mode=wrap_mode, build_env=build_env, foreman_spec=foreman_spec)
+
+
+def _prepare_sandbox(target_root: Path, out_root: Path, tests, wrap_mode,
+                     network_phases, build_env=None) -> dict:
+    """Learn the sandbox policy from a clean LEARN-mode build, then rebuild the
+    clean target under it (false-positive check). Both dirs are reused if present."""
+    learn_dir = out_root / "_sandbox_learn"
+    if (learn_dir / "status.json").exists():
+        learn_run = sbx.load_sandbox_run(str(learn_dir))
+    else:
+        print("sandbox: learning per-phase write policy from a clean build...")
+        learn_run = sbx.run_in_sandbox(str(target_root), str(learn_dir), policy=None,
+                                       tests=tests, wrap_mode=wrap_mode, build_env=build_env)
+    st = learn_run.get("status", {})
+    if st.get("compile_rc") != 0 or learn_run["sandbox"]["errors"]:
+        raise SystemExit(f"sandbox: clean LEARN build failed ({st}); see {learn_dir}")
+    policy = sbx.learn_policy(learn_run)
+    (out_root / "sandbox_policy.json").write_text(json.dumps(policy, indent=2), encoding="utf-8")
+    n = {p: len(v["write_files"]) + len(v["create_in"]) for p, v in policy["phases"].items()}
+    print(f"sandbox: learned policy -> {out_root / 'sandbox_policy.json'} (writable entries per phase: {n})")
+
+    fp_dir = out_root / "_sandbox_clean_check"
+    if (fp_dir / "status.json").exists():
+        fp_run = sbx.load_sandbox_run(str(fp_dir))
+    else:
+        print("sandbox: rebuilding the clean target under the policy (false-positive check)...")
+        fp_run = sbx.run_in_sandbox(str(target_root), str(fp_dir), policy=policy,
+                                    tests=tests, wrap_mode=wrap_mode, build_env=build_env,
+                                    network_phases=network_phases)
+    problems = sbx.clean_check(fp_run, learn_run)
+    if problems:
+        # A sandbox that breaks the clean build would "prevent" every mutant.
+        raise SystemExit("sandbox: clean build FAILS under the policy (false positive): "
+                         + "; ".join(problems) + f"\n  see {fp_dir}")
+    print(f"sandbox: clean rebuild passes under the policy "
+          f"({sum(r == 'OK' for r in fp_run['tests'].values())} tests OK, 0 false positives)")
+    return {"policy": policy, "run": fp_run}
 
 
 def run(target: str, operators_dir: str, out_dir: str,
@@ -88,7 +127,9 @@ def run(target: str, operators_dir: str, out_dir: str,
         tests=DEFAULT_TESTS, wrap_mode: str | None = None,
         defenses: list[str] | None = None,
         only: set[str] | None = None,
-        foreman: str | None = None) -> list[dict]:
+        foreman: str | None = None,
+        sandbox: bool = False, sandbox_network_phases=(),
+        build_env: dict | None = None) -> list[dict]:
     target_root = Path(target).resolve()
     parsed = parse_project(str(target_root))
     operators = load_operators(operators_dir)
@@ -110,7 +151,8 @@ def run(target: str, operators_dir: str, out_dir: str,
     if harness:
         baseline_dir = Path(baseline) if baseline else out_root / "_baseline"
         baseline_run = _load_or_run_baseline(target_root, baseline_dir.resolve(),
-                                             tests, wrap_mode, foreman_spec=foreman)
+                                             tests, wrap_mode, foreman_spec=foreman,
+                                             build_env=build_env)
         if baseline_run.get("status", {}).get("compile_rc") != 0:
             raise SystemExit(f"baseline in {baseline_dir} did not compile; "
                              "fix the clean build before running mutants")
@@ -132,11 +174,16 @@ def run(target: str, operators_dir: str, out_dir: str,
             if not (fp_dir / "status.json").exists():
                 print("foreman: rebuilding the clean target under the spec to measure false positives...")
                 run_in_harness(str(target_root), str(fp_dir), tests=tests,
-                               wrap_mode=wrap_mode, foreman_spec=foreman)
+                               wrap_mode=wrap_mode, build_env=build_env, foreman_spec=foreman)
             fp_run = load_run(str(fp_dir))
             baseline_run["foreman_warnings"] = fp_run.get("foreman_warnings", [])
             print(f"foreman: {len(baseline_run['foreman_warnings'])} warning(s) on the clean rebuild "
                   f"(false positives; see {fp_dir}/foreman_warnings.txt)")
+
+    sbx_clean = None
+    if harness and sandbox:
+        sbx_clean = _prepare_sandbox(target_root, out_root, tests, wrap_mode,
+                                     sandbox_network_phases, build_env=build_env)
 
     for operator in operators:
         candidates = placement_find_candidates(parsed, operator)
@@ -157,14 +204,14 @@ def run(target: str, operators_dir: str, out_dir: str,
                 record["validation"] = {"status": "skipped", "setup_ok": False,
                                         "returncode": None, "log_tail": ""}
 
-            effect = operator.get("effect")
+            effect = resolve_effect(operator, candidate)
             if harness and record["applied"]:
                 # Run outputs live outside the mutant dir so later runs
                 # don't copy earlier results into the build.
                 runs_root = out_root / "_runs" / mutant_name
                 mutant_runs = [
                     run_in_harness(record["mutant_dir"], str(runs_root / f"run{i}"),
-                                   tests=tests, wrap_mode=wrap_mode, foreman_spec=foreman)
+                                   tests=tests, wrap_mode=wrap_mode, build_env=build_env, foreman_spec=foreman)
                     for i in range(1, runs + 1)
                 ]
                 record["validity"] = classify_runs(mutant_runs, baseline_run, effect)
@@ -188,6 +235,24 @@ def run(target: str, operators_dir: str, out_dir: str,
                     "name": "foreman", "mode": "detect", "blocked": False,
                     "detected": bool(new_w), "flags": new_w[:50],
                     "spec": foreman})
+
+            if sbx_clean and record["applied"]:
+                # Enforcing defense: build the mutant phase by phase in the
+                # sandbox and see whether its declared effect escapes a phase.
+                sbx_run = sbx.run_in_sandbox(
+                    record["mutant_dir"], str(out_root / "_runs" / mutant_name / "sandbox"),
+                    policy=sbx_clean["policy"], tests=tests, wrap_mode=wrap_mode, build_env=build_env,
+                    network_phases=sandbox_network_phases)
+                o = sbx.sandbox_outcome(sbx_run, sbx_clean["run"], effect)
+                if record.get("validity", {}).get("level") != "effective" \
+                        and o["outcome"] in ("prevented", "confined", "not_blocked"):
+                    # The effect never happened even without a defense, so
+                    # "prevented" would overclaim. Keep the raw outcome for audit.
+                    o = {**o, "raw_outcome": o["outcome"], "outcome": "not_effective",
+                         "blocked": False}
+                record.setdefault("defenses", []).append({
+                    "name": "sandbox", "mode": "enforce", **o,
+                    "network_phases": list(sandbox_network_phases)})
 
             # Provenance alongside the mutant.
             diff = _unified_diff(target_root, record)
@@ -221,6 +286,12 @@ def main() -> int:
                     help="space-separated meson test names to run")
     ap.add_argument("--wrap-mode", default=None,
                     help="meson --wrap-mode, e.g. forcefallback for wrap operators")
+    ap.add_argument("--setup-args", default=None, metavar="ARGS",
+                    help="extra meson setup args for every build, e.g. "
+                         "'--force-fallback-for=pcre2,zlib' (GLib)")
+    ap.add_argument("--fetch-subprojects", default=None, metavar="NAMES",
+                    help="space-separated subprojects to download in the fetch phase "
+                         "(default: all), e.g. 'pcre2 zlib' (GLib)")
     ap.add_argument("--defense", action="append", default=[], metavar="NAME",
                     help="static defense to run against each mutant (repeatable); "
                          "available: " + (", ".join(available_defenses()) or "none"))
@@ -228,9 +299,20 @@ def main() -> int:
                     help="run every harness build under Foreman (Pappas & Gazzillo) with this "
                          "phase spec; a spec with no permissions is learned from the clean build. "
                          "Needs --harness and a baseline dir built under Foreman.")
+    ap.add_argument("--sandbox", action="store_true",
+                    help="also build each mutant in the per-phase isolation sandbox "
+                         "(enforcing defense; policy learned from a clean build)")
+    ap.add_argument("--sandbox-network-phase", action="append", default=[],
+                    choices=("fetch", "setup", "compile", "test"), metavar="PHASE",
+                    help="give this sandbox phase network access, so its mock-server "
+                         "requests count as escaped (repeatable; default: none)")
     ap.add_argument("--only", action="append", default=[], metavar="OP",
                     help="run only this operator (file prefix like op_013, or its id); repeatable")
     args = ap.parse_args()
+    if args.sandbox and not args.harness:
+        ap.error("--sandbox needs --harness")
+    if args.foreman and not args.harness:
+        ap.error("--foreman needs --harness (Foreman runs inside the harness build)")
 
     if args.harness:
         check_docker()  # fail fast: a dead daemon would score every mutant setup_failed
@@ -251,7 +333,11 @@ def main() -> int:
                   args.validate, args.reference_placement,
                   harness=args.harness, baseline=args.baseline, runs=args.runs,
                   tests=tuple(args.tests.split()), wrap_mode=args.wrap_mode,
-                  defenses=args.defense, only=only or None, foreman=args.foreman)
+                  defenses=args.defense, only=only or None, foreman=args.foreman,
+                  sandbox=args.sandbox,
+                  sandbox_network_phases=tuple(args.sandbox_network_phase),
+                  build_env={"SETUP_ARGS": args.setup_args,
+                             "FETCH_SUBPROJECTS": args.fetch_subprojects})
 
     applied = sum(1 for r in results if r["applied"])
     valid = sum(1 for r in results
@@ -269,6 +355,14 @@ def main() -> int:
         det = sum(1 for r in eff if any(d["name"] == "foreman" and d.get("detected")
                                         for d in r.get("defenses", [])))
         print(f"defense foreman: detected {det}/{len(eff)} effective mutant(s)")
+    if args.sandbox:
+        from collections import Counter
+        eff = [r for r in results if r.get("validity", {}).get("level") == "effective"]
+        oc = Counter(next((d["outcome"] for d in r.get("defenses", []) if d["name"] == "sandbox"),
+                          "missing") for r in eff)
+        print(f"defense sandbox: blocked {oc['prevented'] + oc['confined']}/{len(eff)} effective "
+              f"mutant(s) (prevented={oc['prevented']}, confined={oc['confined']}, "
+              f"not_blocked={oc['not_blocked']}, error={oc['error']})")
     if args.defense:
         applied = [r for r in results if r.get("applied")]
         eff = [r for r in applied if r.get("validity", {}).get("level") == "effective"]

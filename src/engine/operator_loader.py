@@ -24,9 +24,9 @@ _REQUIRED_TOP = ("id", "scheme", "template")
 _VALID_SCHEMES = ("dependency_aware", "config_aware", "adversarial", "all")
 _VALID_MODES = ("replace", "delete_line", "insert_after", "append")
 _VALID_OBSERVABLES = ("file_write", "network_fetch", "env_exfil",
-                      "artifact_diff", "test_input_swap")
+                      "artifact_diff", "test_input_swap", "feature_disabled")
 _VALID_CHECK_KEYS = ("marker", "request_path", "contains", "artifact",
-                     "tests_may_fail")
+                     "tests_may_fail", "subproject", "wrap_file")
 
 
 def load_operator(file_path: str) -> dict:

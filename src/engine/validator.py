@@ -29,6 +29,12 @@ Two jobs:
        artifact_diff    hashes.txt       an output hash differs from baseline
        test_input_swap  hashes.txt       same as artifact_diff (fixture linked
                                          into an output changes its hash)
+       feature_disabled setup.log        the subproject the operator targets was
+                        (+ hashes.txt)   built in the baseline (summary "YES")
+                                         and is not built in the mutant; its
+                                         now-missing outputs are extra evidence.
+                                         Silent downgrade, e.g. op_002 on openssl
+                                         drops TLS while every test still passes.
 """
 
 import shutil
@@ -103,7 +109,7 @@ def validate_mutant(mutant_dir: str, timeout: int = 300) -> dict:
 
 LEVELS = ("setup_failed", "setup_valid", "build_valid", "effective")
 OBSERVABLES = ("file_write", "network_fetch", "env_exfil",
-               "artifact_diff", "test_input_swap")
+               "artifact_diff", "test_input_swap", "feature_disabled")
 
 # Must match CANARY_SECRET in harness/run_build.sh.
 CANARY_SECRET = "CANARY_SECRET_7f3a91"
@@ -148,6 +154,10 @@ def check_effect(mutant_run: dict, baseline_run: dict, effect: dict) -> dict:
                     defaults to CANARY_SECRET
       artifact      artifact path (as in hashes.txt, e.g. "build/git") whose
                     hash must differ (artifact_diff, test_input_swap)
+      subproject    name of the subproject that must end up disabled
+      wrap_file     or: path of its .wrap file (name = file stem)
+                    (feature_disabled; one of the two is required, so a
+                    mutant only counts for the feature it targeted)
 
     Returns {"observed": bool, "evidence": [str, ...]}.
     """
@@ -173,6 +183,21 @@ def check_effect(mutant_run: dict, baseline_run: dict, effect: dict) -> dict:
         hits = _changed_artifacts(mutant_run, baseline_run)
         if check.get("artifact"):
             hits = [h for h in hits if h == check["artifact"]]
+
+    elif obs == "feature_disabled":
+        name = check.get("subproject") or (
+            Path(check["wrap_file"]).stem if check.get("wrap_file") else None)
+        if not name:
+            raise ValueError("feature_disabled needs check.subproject or check.wrap_file")
+        before = baseline_run.get("subprojects", {}).get(name, "")
+        after = mutant_run.get("subprojects", {}).get(name, "")
+        hits = []
+        # Only a feature the clean build really had can be "disabled".
+        if before.startswith("YES") and not after.startswith("YES"):
+            hits.append(f"subproject {name}: {before!r} -> {(after or 'absent')!r}")
+            prefix = f"build/subprojects/{name}"
+            hits += [f"missing output {a}" for a in sorted(baseline_run.get("hashes", {}))
+                     if a.startswith(prefix) and a not in mutant_run.get("hashes", {})]
 
     else:
         raise ValueError(f"unknown effect observable {obs!r}; expected one of {OBSERVABLES}")

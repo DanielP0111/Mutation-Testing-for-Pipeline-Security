@@ -32,6 +32,27 @@ class HarnessUnavailable(RuntimeError):
     """The container never ran, so there are no results to record."""
 
 
+# Per-target build settings passed to harness/step.sh (see build_env_args).
+BUILD_ENV_KEYS = ("SETUP_ARGS", "FETCH_SUBPROJECTS")
+
+
+def build_env_args(build_env: dict | None) -> list[str]:
+    """
+    docker -e flags for per-target build settings:
+      SETUP_ARGS         extra `meson setup` arguments, e.g.
+                         "--force-fallback-for=pcre2,zlib" (GLib)
+      FETCH_SUBPROJECTS  subprojects for `meson subprojects download`
+                         (default: all), e.g. "pcre2 zlib"
+    """
+    out = []
+    for k, v in (build_env or {}).items():
+        if k not in BUILD_ENV_KEYS:
+            raise ValueError(f"unknown build_env key {k!r}; expected one of {BUILD_ENV_KEYS}")
+        if v:
+            out += ["-e", f"{k}={v}"]
+    return out
+
+
 def check_docker(image: str = DEFAULT_IMAGE, timeout: int = 15) -> None:
     """
     Fail fast if the harness cannot run: Docker CLI missing, daemon unreachable
@@ -52,7 +73,8 @@ def check_docker(image: str = DEFAULT_IMAGE, timeout: int = 15) -> None:
         fail("docker not found on PATH. Install Docker Desktop and retry.")
     except subprocess.TimeoutExpired:
         fail(f"`docker info` did not answer within {timeout}s. "
-             "Is Docker Desktop still starting? Wait for it and retry.")
+             "Docker Desktop may be starting or shutting down; wait until it "
+             "is fully up and retry.")
     if info.returncode != 0:
         detail = (info.stderr or info.stdout).strip().splitlines()
         fail("Docker is not reachable. Start Docker Desktop and retry."
@@ -78,6 +100,7 @@ def run_in_harness(
     image: str = DEFAULT_IMAGE,
     timeout: int = 3600,
     foreman_spec: str | None = None,
+    build_env: dict | None = None,
 ) -> dict:
     """
     Build and test `source_dir` in the harness container; return load_run(out_dir).
@@ -96,6 +119,7 @@ def run_in_harness(
     cmd += ["-e", f"TESTS={' '.join(tests)}"]
     if wrap_mode:
         cmd += ["-e", f"WRAP_MODE={wrap_mode}"]
+    cmd += build_env_args(build_env)
     if foreman_spec:
         # Foreman decides "accessed" from file access times, so /src must record
         # every read: a tmpfs mounted with strictatime (Docker's default overlay
@@ -183,4 +207,32 @@ def load_run(out_dir: str) -> dict:
         "markers": [l for l in read("markers.txt").splitlines() if l.strip()],
         "requests": [l for l in read("mock_server.log").splitlines() if l.strip()],
         "foreman_warnings": [l for l in read("foreman_warnings.txt").splitlines() if l.strip()],
+        "subprojects": parse_subprojects(read("setup.log")),
     }
+
+
+def parse_subprojects(setup_log: str) -> dict:
+    """
+    The "Subprojects" block of Meson's configure summary, e.g.
+
+          Subprojects
+            curl     : YES
+            openssl  : NO Missing key 'source_hash' in openssl.wrap
+
+    -> {"curl": "YES", "openssl": "NO Missing key ..."}. Empty if absent.
+    The last block wins (the top-level project's summary is printed last).
+    """
+    out: dict = {}
+    lines = setup_log.splitlines()
+    for i, line in enumerate(lines):
+        if line.strip() != "Subprojects":
+            continue
+        block = {}
+        for nxt in lines[i + 1:]:
+            if not nxt.strip() or ":" not in nxt:
+                break
+            name, _, status = nxt.partition(":")
+            block[name.strip()] = status.strip()
+        if block:
+            out = block
+    return out

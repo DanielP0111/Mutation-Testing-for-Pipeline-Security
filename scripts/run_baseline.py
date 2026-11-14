@@ -35,6 +35,10 @@ def main() -> int:
     ap.add_argument("--out", default="data/evaluation/baseline")
     ap.add_argument("--tests", default=" ".join(DEFAULT_TESTS))
     ap.add_argument("--wrap-mode", default=None)
+    ap.add_argument("--setup-args", default=None,
+                    help="extra meson setup args, e.g. '--force-fallback-for=pcre2,zlib'")
+    ap.add_argument("--fetch-subprojects", default=None,
+                    help="subprojects to download in the fetch phase (default: all)")
     ap.add_argument("--network", action="store_true",
                     help="allow network (default: --network none)")
     ap.add_argument("--repeat", type=int, default=1,
@@ -47,7 +51,9 @@ def main() -> int:
     runs = []
     for o in outs:
         run = run_in_harness(args.target, str(o), tests=tuple(args.tests.split()),
-                             network=args.network, wrap_mode=args.wrap_mode)
+                             network=args.network, wrap_mode=args.wrap_mode,
+                             build_env={"SETUP_ARGS": args.setup_args,
+                                        "FETCH_SUBPROJECTS": args.fetch_subprojects})
         runs.append(run)
         print(f"{o}: status={json.dumps(run['status'])} "
               f"artifacts={len(run['hashes'])} "
