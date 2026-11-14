@@ -15,7 +15,7 @@
 #   numpy  — NumPy v2.0.0  (Meson, but NO .wrap files; needs its vendored Meson fork + Cython)
 #   scipy  — SciPy v1.14.0 (Meson, but NO .wrap files)
 #   gnome-glib — GLib 2.80.0 (second target; plain C; wrap-file: pcre2, zlib;
-#                the rest are wrap-git). Build with
+#                the rest are wrap-git; zlib.wrap swapped to 1.3.1 below). Build with
 #                --setup-args=--force-fallback-for=pcre2,zlib --fetch-subprojects='pcre2 zlib'
 
 set -euo pipefail
@@ -90,6 +90,26 @@ clone_at_tag \
     "gnome-glib" \
     "https://github.com/GNOME/glib.git" \
     "2.80.0"
+
+# GLib 2.80.0 pins zlib 1.2.11 from zlib.net/fossils, which no longer serves a
+# tarball matching the pinned hash (hash mismatch, Nov 14). Swap in the same
+# zlib 1.3.1 wrap the git target uses (WrapDB, with a GitHub fallback URL).
+cp "${TARGETS_DIR}/git/subprojects/zlib.wrap" "${TARGETS_DIR}/gnome-glib/subprojects/zlib.wrap" 2>/dev/null || \
+cat > "${TARGETS_DIR}/gnome-glib/subprojects/zlib.wrap" <<'WRAP'
+[wrap-file]
+directory = zlib-1.3.1
+source_url = http://zlib.net/fossils/zlib-1.3.1.tar.gz
+source_fallback_url = https://github.com/mesonbuild/wrapdb/releases/download/zlib_1.3.1-1/zlib-1.3.1.tar.gz
+source_filename = zlib-1.3.1.tar.gz
+source_hash = 9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23
+patch_filename = zlib_1.3.1-1_patch.zip
+patch_url = https://wrapdb.mesonbuild.com/v2/zlib_1.3.1-1/get_patch
+patch_hash = e79b98eb24a75392009cec6f99ca5cdca9881ff20bfa174e8b8926d5c7a47095
+wrapdb_version = 1.3.1-1
+
+[provide]
+zlib = zlib_dep
+WRAP
 
 echo ""
 echo "All targets ready in ${TARGETS_DIR}/"
