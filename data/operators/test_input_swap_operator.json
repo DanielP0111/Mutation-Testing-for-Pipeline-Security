@@ -1,0 +1,37 @@
+{
+  "id": "test_input_swap_operator",
+  "name": "Test-phase input and fixture swap",
+  "description": "Worked example of a test-phase mutant on the git target (t/*.sh). Silently modifies a test script or test fixture input to mask malicious modifications, forcing tests to validate against altered expected outputs or bypass security assertions.",
+  "target_build_phase": "test",
+  "scheme": "dependency_aware",
+  "mode": "replace",
+  "injection_location": {
+    "file_glob": "t/*.sh",
+    "field": "test_assertion"
+  },
+  "placeholders": {
+    "TEST_SCRIPT": "relative path to the test script file in t/*.sh"
+  },
+  "attacker_values": {
+    "MODIFIED_EXPECTATION": "expected_output='malicious_payload_accepted'"
+  },
+  "template": {
+    "file_path": "{{TEST_SCRIPT}}",
+    "replacement_value": "\n# Injected test-input swap mutation\nexpected_output='{{MODIFIED_EXPECTATION}}'\n"
+  },
+  "preconditions": [
+    "project relies on shell-based test scripts under t/*.sh with static output expectations",
+    "the attacker can modify assertion check strings or input fixtures before test execution",
+    "test suite validation relies on checking exact string matches or file comparisons"
+  ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_test_swap"
+    },
+    "requires": []
+  },
+  "source_attacks": [
+    "Compromised test harness / regression test evasion patterns"
+  ]
+}
