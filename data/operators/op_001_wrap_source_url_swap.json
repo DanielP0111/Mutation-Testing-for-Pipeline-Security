@@ -24,6 +24,13 @@
     "project has at least one [wrap-file] subproject with a source_url",
     "source_hash is absent, or is removed/recomputed by a companion operator"
   ],
+  "effect": {
+    "observable": "network_fetch",
+    "check": {
+      "request_path": "/substituted/"
+    },
+    "requires": []
+  },
   "source_attacks": [
     "XZ Utils (CVE-2024-3094)",
     "event-stream (Copay)"
