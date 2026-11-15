@@ -24,11 +24,11 @@
     "project uses the Meson build system for packaging and distribution",
     "the attacker can modify or inject hooks into the project's meson.build file",
     "the release workflow executes `meson dist` or `meson install` to assemble final deliverables"
-  ],
+   ],
   "effect": {
-    "observable": "file_write",
+    "observable": "network_fetch",
     "check": {
-      "marker": "PWNED_release"
+      "request_path": "/substituted/"
     },
     "requires": []
   },
