@@ -21,14 +21,14 @@
   "preconditions": [
     "project has at least one [wrap-file] subproject with a source_hash field"
   ],
-  "source_attacks": [
-    "XZ Utils (CVE-2024-3094)"
-  ],
   "effect": {
     "observable": "feature_disabled",
     "check": {
       "wrap_file": "{{WRAP_FILE}}"
     },
     "requires": []
-  }
+  },
+  "source_attacks": [
+    "XZ Utils (CVE-2024-3094)"
+]
 }
