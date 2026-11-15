@@ -1,1 +1,39 @@
-
+{
+  "id": "compiler_toolchain_injection_meson",
+  "name": "Compiler toolchain injection (Meson)",
+  "description": "Meson-adapted version of the compile-stage mutant. Models the XcodeGhost (2015) attack by leveraging Meson's native build configuration file ([binaries] section) or a find_program override to substitute the compiler toolchain, dropping a marker file upon execution.",
+  "target_build_phase": "configure",
+  "scheme": "dependency_aware",
+  "mode": "replace",
+  "injection_location": {
+    "file_glob": "meson.native",
+    "section": "binaries",
+    "field": "c"
+  },
+  "placeholders": {
+    "NATIVE_FILE": "path to the Meson native configuration file or toolchain spec"
+  },
+  "attacker_values": {
+    "MARKER_ID": "git001"
+  },
+  "template": {
+    "file_path": "{{NATIVE_FILE}}",
+    "replacement_value": "[binaries]\nc = '/opt/toolchain/wrapped_cc'\n\n# Wrapped compiler script behavior:\n#!/bin/sh\necho 'xcodeghost_pwned' > /tmp/PWNED_compiler_{{MARKER_ID}}\nexec /usr/bin/cc \"$@\""
+  },
+  "preconditions": [
+    "project uses Meson build system with a native file or find_program wrapper override",
+    "the attacker can substitute or tamper with the Meson native configuration or lookup path",
+    "the build configuration step processes the modified native file",
+    "the build execution invokes the substituted compiler wrapper"
+  ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_compiler"
+    },
+    "requires": []
+  },
+  "source_attacks": [
+  	"XcodeGhost (2015)"
+  ]
+}
