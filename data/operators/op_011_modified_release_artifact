@@ -1,1 +1,38 @@
-
+{
+  "id": "release_artifact_tampering_meson",
+  "name": "Release artifact tampering via Meson dist/install script",
+  "description": "Meson-adapted version of the package_release mutant. Models release artifact tampering (similar to ASUS Live Update / ShadowHammer) by injecting add_dist_script or add_install_script into meson.build to execute a payload during distribution packaging or installation, dropping a marker file upon execution.",
+  "target_build_phase": "package_release",
+  "scheme": "dependency_aware",
+  "mode": "inject",
+  "injection_location": {
+    "file_glob": "meson.build",
+    "field": "add_dist_script"
+  },
+  "placeholders": {
+    "MESON_FILE": "path to the root meson.build file",
+    "TAMPER_SCRIPT": "path to the script executed during distribution or installation"
+  },
+  "attacker_values": {
+    "MARKER_ID": "git011"
+  },
+  "template": {
+    "file_path": "{{MESON_FILE}}",
+    "replacement_value": "\n# Injected supply chain mutation operator hook\nadd_dist_script('{{TAMPER_SCRIPT}}')\n"
+  },
+  "preconditions": [
+    "project uses the Meson build system for packaging and distribution",
+    "the attacker can modify or inject hooks into the project's meson.build file",
+    "the release workflow executes `meson dist` or `meson install` to assemble final deliverables"
+  ],
+  "effect": {
+    "observable": "file_write",
+    "check": {
+      "marker": "PWNED_release"
+    },
+    "requires": []
+  },
+  "source_attacks": [
+    "ASUS Live Update (ShadowHammer) (2019)"
+  ]
+}
