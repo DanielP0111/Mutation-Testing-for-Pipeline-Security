@@ -3,8 +3,8 @@
   "name": "Release artifact tampering via Meson dist/install script",
   "description": "Meson-adapted version of the package_release mutant. Models release artifact tampering (similar to ASUS Live Update / ShadowHammer) by injecting add_dist_script or add_install_script into meson.build to execute a payload during distribution packaging or installation, dropping a marker file upon execution.",
   "target_build_phase": "package_release",
-  "scheme": "dependency_aware",
-  "mode": "inject",
+  "scheme": "config_aware",
+  "mode": "append",
   "injection_location": {
     "file_glob": "meson.build",
     "field": "add_dist_script"
