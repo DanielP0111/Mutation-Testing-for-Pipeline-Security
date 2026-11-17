@@ -299,3 +299,55 @@ class TestConditionalsIgnoreEmbeddedStrings:
         assert conditions == ["get_option('feature-y')", "host_machine.system() == 'windows'"]
         nested = [c for c in conds if c["condition"].startswith("get_option")]
         assert nested[0]["depth"] == 2
+
+
+# ===========================================================================
+# Regression: elif must share its sibling if's depth
+# ===========================================================================
+
+class TestElifDepth:
+    """_find_conditionals used to compute an elif's depth before popping the
+    open if, so every elif was reported one level deeper than its if."""
+
+    def test_elif_same_depth_as_if(self, tmp_path: Path):
+        (tmp_path / "meson.build").write_text(
+            "project('elif', 'c')\n"
+            "if get_option('a')\n"
+            "  x = 1\n"
+            "elif get_option('b')\n"
+            "  x = 2\n"
+            "elif get_option('c')\n"
+            "  x = 3\n"
+            "else\n"
+            "  x = 4\n"
+            "endif\n"
+        )
+        conds = parse_project(str(tmp_path))["conditionals"]
+        assert sorted(c["condition"] for c in conds) == [
+            "get_option('a')", "get_option('b')", "get_option('c')"]
+        assert all(c["depth"] == 1 for c in conds)
+        by_cond = {c["condition"]: c for c in conds}
+        assert by_cond["get_option('a')"]["line_end"] == 3
+        assert by_cond["get_option('b')"]["line_end"] == 5
+
+    def test_nested_elif_depth(self, tmp_path: Path):
+        (tmp_path / "meson.build").write_text(
+            "project('elif', 'c')\n"
+            "if host_machine.system() == 'linux'\n"
+            "  if get_option('a')\n"
+            "    x = 1\n"
+            "  elif get_option('b')\n"
+            "    x = 2\n"
+            "  endif\n"
+            "elif host_machine.system() == 'darwin'\n"
+            "  y = 1\n"
+            "endif\n"
+        )
+        conds = parse_project(str(tmp_path))["conditionals"]
+        depths = {c["condition"]: c["depth"] for c in conds}
+        assert depths == {
+            "host_machine.system() == 'linux'": 1,
+            "get_option('a')": 2,
+            "get_option('b')": 2,
+            "host_machine.system() == 'darwin'": 1,
+        }

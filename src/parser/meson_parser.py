@@ -125,6 +125,14 @@ def _find_conditionals(root: Path) -> list[dict]:
             m = if_re.match(line.rstrip())
             if m:
                 keyword, condition = m.group(2), m.group(3)
+
+                if keyword == "elif" and depth_stack:
+                    # elif closes the current open block first, so it sits
+                    # at the same depth as its sibling if, not one deeper.
+                    prev = depth_stack.pop()
+                    prev["line_end"] = lineno - 1
+                    conditionals.append(prev)
+
                 depth = len(depth_stack) + 1
 
                 entry = {
@@ -135,15 +143,7 @@ def _find_conditionals(root: Path) -> list[dict]:
                     "depth": depth,
                 }
 
-                if keyword == "if":
-                    depth_stack.append(entry)
-                else:
-                    # elif: close the current open block, open a new one
-                    if depth_stack:
-                        prev = depth_stack.pop()
-                        prev["line_end"] = lineno - 1
-                        conditionals.append(prev)
-                    depth_stack.append(entry)
+                depth_stack.append(entry)
 
             elif re.match(r"^\s*endif\b", line.rstrip()):
                 if depth_stack:
