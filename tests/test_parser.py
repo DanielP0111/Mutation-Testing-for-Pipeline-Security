@@ -222,3 +222,80 @@ class TestParseProject:
         kinds = {c["call"] for c in result["build_calls"]}
         assert "run_command" in kinds
         assert "custom_target" in kinds
+
+
+# ===========================================================================
+# Regression: embedded ''' ... ''' strings must not be scanned for build logic
+# ===========================================================================
+
+class TestConditionalsIgnoreEmbeddedStrings:
+    """GLib's glib/gnulib/* files embed whole C test programs inside Meson
+    ''' ... ''' strings (passed to cc.run()/cc.compiles()). Those programs
+    contain their own `if (...)` / `else` lines that start a line. Before the
+    _mask_triple_quoted() fix, the line-based parser counted them as Meson
+    conditionals — with no matching Meson `endif` — which inflated both the
+    conditional count and the reported nesting depth (observed: depth 39 on
+    real GLib). These tests lock in that embedded-string contents are ignored.
+    """
+
+    def test_c_if_lines_inside_triple_quoted_string_are_not_conditionals(self, tmp_path: Path):
+        (tmp_path / "meson.build").write_text(
+            "project('embed', 'c')\n"
+            "test_prog = '''\n"
+            "int main (void) {\n"
+            "  if (sprintf (buf, \"%d\", x) < 0)\n"
+            "    return 1;\n"
+            "  if (foo)\n"
+            "    if (bar)\n"
+            "      return 2;\n"
+            "  return 0;\n"
+            "}\n"
+            "'''\n"
+            "r = cc.run(test_prog)\n"
+            "if get_option('feature-x')\n"
+            "  message('real meson branch')\n"
+            "endif\n"
+        )
+        result = parse_project(str(tmp_path))
+        conds = result["conditionals"]
+        # Exactly one real Meson conditional — the get_option branch.
+        assert len(conds) == 1
+        assert conds[0]["condition"] == "get_option('feature-x')"
+        assert conds[0]["depth"] == 1
+        # None of the embedded C `if` lines leaked in.
+        assert all("sprintf" not in c["condition"] for c in conds)
+
+    def test_depth_not_inflated_by_embedded_string(self, tmp_path: Path):
+        # A deeply "nested"-looking C block inside a string, followed by a
+        # single real depth-1 meson branch, must report max depth 1.
+        c_body = "\n".join(f"{'  ' * i}if (level{i})" for i in range(10))
+        (tmp_path / "meson.build").write_text(
+            "project('embed', 'c')\n"
+            f"prog = '''\n{c_body}\n'''\n"
+            "if host_machine.system() == 'linux'\n"
+            "  message('x')\n"
+            "endif\n"
+        )
+        result = parse_project(str(tmp_path))
+        conds = result["conditionals"]
+        assert max(c["depth"] for c in conds) == 1
+        assert len(conds) == 1
+
+    def test_real_conditionals_outside_strings_still_found(self, tmp_path: Path):
+        # Guard against over-masking: real if/elif/endif around a string
+        # literal must still be parsed normally.
+        (tmp_path / "meson.build").write_text(
+            "project('embed', 'c')\n"
+            "if host_machine.system() == 'windows'\n"
+            "  doc = '''\n  if (this is C, ignore me)\n  '''\n"
+            "  if get_option('feature-y')\n"
+            "    message('nested real branch')\n"
+            "  endif\n"
+            "endif\n"
+        )
+        result = parse_project(str(tmp_path))
+        conds = result["conditionals"]
+        conditions = sorted(c["condition"] for c in conds)
+        assert conditions == ["get_option('feature-y')", "host_machine.system() == 'windows'"]
+        nested = [c for c in conds if c["condition"].startswith("get_option")]
+        assert nested[0]["depth"] == 2
