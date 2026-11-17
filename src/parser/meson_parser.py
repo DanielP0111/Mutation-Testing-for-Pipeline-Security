@@ -11,6 +11,29 @@ from pathlib import Path
 from .wrap_parser import parse_wrap_file
 
 
+# Meson's multi-line string literal is ''' ... ''' (it has no """ form).
+# GLib and other projects embed whole C/shell test programs inside these
+# strings (passed to cc.run()/cc.compiles()). Those embedded programs have
+# their own `if (...)` / `else` lines that start a line and would otherwise
+# be miscounted as Meson conditionals — with no matching Meson `endif`, so
+# the nesting-depth stack grows without bound (observed: GLib's
+# glib/gnulib/* files reporting conditionals at depth 39). We blank the
+# bodies of these strings before the line scan so their contents are not
+# mistaken for build logic.
+_TRIPLE_QUOTED_RE = re.compile(r"'''.*?'''", re.DOTALL)
+
+
+def _mask_triple_quoted(text: str) -> str:
+    """Replace every character inside a ''' ... ''' span with a space,
+    leaving newlines (and therefore line numbers and total length)
+    untouched. The delimiters themselves are blanked too; nothing outside
+    the spans is changed."""
+    def _blank(match: "re.Match") -> str:
+        return re.sub(r"[^\n]", " ", match.group(0))
+
+    return _TRIPLE_QUOTED_RE.sub(_blank, text)
+
+
 def parse_project(project_dir: str) -> dict:
     """
     Parse a Meson project directory and return structured data.
@@ -91,14 +114,25 @@ def _find_conditionals(root: Path) -> list[dict]:
         depth_stack: list[dict] = []
 
         try:
-            lines = build_file.read_text(encoding="utf-8", errors="ignore").splitlines()
+            raw = build_file.read_text(encoding="utf-8", errors="ignore")
         except OSError:
             continue
+        # Blank ''' ... ''' string bodies so embedded C/shell `if`/`else`
+        # lines inside them are not counted as Meson conditionals.
+        lines = _mask_triple_quoted(raw).splitlines()
 
         for lineno, line in enumerate(lines, start=1):
             m = if_re.match(line.rstrip())
             if m:
                 keyword, condition = m.group(2), m.group(3)
+
+                if keyword == "elif" and depth_stack:
+                    # elif closes the current open block first, so it sits
+                    # at the same depth as its sibling if, not one deeper.
+                    prev = depth_stack.pop()
+                    prev["line_end"] = lineno - 1
+                    conditionals.append(prev)
+
                 depth = len(depth_stack) + 1
 
                 entry = {
@@ -109,15 +143,7 @@ def _find_conditionals(root: Path) -> list[dict]:
                     "depth": depth,
                 }
 
-                if keyword == "if":
-                    depth_stack.append(entry)
-                else:
-                    # elif: close the current open block, open a new one
-                    if depth_stack:
-                        prev = depth_stack.pop()
-                        prev["line_end"] = lineno - 1
-                        conditionals.append(prev)
-                    depth_stack.append(entry)
+                depth_stack.append(entry)
 
             elif re.match(r"^\s*endif\b", line.rstrip()):
                 if depth_stack:

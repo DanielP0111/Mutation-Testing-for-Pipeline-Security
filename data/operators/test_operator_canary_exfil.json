@@ -3,8 +3,8 @@
   "name": "Test-phase canary exfiltration via shell script injection",
   "description": "Worked example of a test-phase mutant on the git target (t/*.sh). Modifies a test shell script to exfiltrate a simulated secret or canary token to a local mock server during test execution, validating network-based observables.",
   "target_build_phase": "test",
-  "scheme": "dependency_aware",
-  "mode": "inject",
+  "scheme": "config_aware",
+  "mode": "append",
   "injection_location": {
     "file_glob": "t/*.sh",
     "field": "script_body"
@@ -14,7 +14,8 @@
     "MOCK_SERVER": "base URL or endpoint of the attacker-controlled mock server"
   },
   "attacker_values": {
-    "EXFIL_ENDPOINT": "/canary-exfil"
+    "EXFIL_ENDPOINT": "/canary-exfil",
+    "MOCK_SERVER": "127.0.0.1:8000"
   },
   "template": {
     "file_path": "{{TEST_SCRIPT}}",

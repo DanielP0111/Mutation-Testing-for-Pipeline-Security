@@ -66,15 +66,11 @@ class TestAnalyzeBranchReachability:
         parsed = parse_project(str(project_dir))
         report = analyze_branch_reachability(parsed)
 
-        # if-linux (1), if-feature-x (2), elif-feature-y, if-windows (1).
-        # Note: meson_parser.py computes an elif's depth from the stack
-        # depth *before* popping the branch it's replacing, so
-        # elif-feature-y comes out at depth 3, not 2, here — a pre-existing
-        # quirk in the parser (Daniel's module), not something fixed by
-        # this placement work. Asserting the actual behavior rather than
-        # the "should be" value so this test catches a real regression.
+        # if-linux (1), if-feature-x (2), elif-feature-y (2), if-windows (1).
+        # elif shares its sibling if's depth (parser fix, Nov 2026; this
+        # previously came out as 3 due to an off-by-one in the parser).
         depths = sorted(r["depth"] for r in report)
-        assert depths == [1, 1, 2, 3]
+        assert depths == [1, 1, 2, 2]
 
         gating = {opt for r in report for opt in r["gating_options"]}
         assert gating == {"feature-x", "feature-y"}
