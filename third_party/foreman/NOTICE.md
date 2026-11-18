@@ -9,10 +9,15 @@
 - `foreman.py`, `README.md`, `LICENSE`, `demo.def`, `run-demo.sh` are copied
   verbatim. The demo XZ tarball (the real backdoored xz 5.6.0 source) is left
   inside artifact.zip on purpose and is not extracted.
-- We do not edit foreman.py. `harness/foreman_launch.py` imports it and adds two
+- We do not edit foreman.py. `harness/foreman_launch.py` imports it and adds
   shims, see that file:
   1. `os.reload_environ` exists only on Python 3.14; the harness image has 3.11.
      Foreman's env-var tracking re-reads its own process environment, which
      child processes cannot change, so a no-op shim does not change results.
   2. `is_file_in_any_paths` raises FileNotFoundError for a file deleted during
      a phase; the shim falls back to an equivalent path-prefix check.
+  3. (speed only) a path-prefix version of `is_file_in_any_paths` that gives
+     the same answer without re-walking directories; `FOREMAN_EXACT=1` disables it.
+  4. `map_files_in_cwd_to_stats` uses `stat()`, which raises on a dangling
+     symlink (GLib's build tree has one after `meson setup`). The shim records
+     a dangling link by its `lstat()`; all other files are unchanged.
