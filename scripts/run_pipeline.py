@@ -141,6 +141,7 @@ def run(target: str, operators_dir: str, out_dir: str,
     target_name = target_root.name
     results = []
     counter = 0
+    fill_errors: list[dict] = []
 
     defenses = defenses or []
     defense_manifests = learn_manifests(defenses, target_root) if defenses else {}
@@ -191,8 +192,19 @@ def run(target: str, operators_dir: str, out_dir: str,
             candidates = reference_find_candidates(parsed, operator)
 
         for candidate in candidates:
+            try:
+                filled = fill_template(operator, candidate)
+            except ValueError as e:
+                # A broken operator (e.g. a placeholder placement never
+                # supplies) must not abort a multi-hour run: skip it, say so,
+                # and list it in the summary.
+                fill_errors.append({"operator": operator.get("id"),
+                                    "file_path": candidate.get("file_path"),
+                                    "error": str(e)})
+                print(f"WARNING: skipping {operator.get('id')} on "
+                      f"{candidate.get('file_path')}: {e}")
+                continue
             counter += 1
-            filled = fill_template(operator, candidate)
             mutant_name = f"{target_name}_{operator['id']}_{counter:04d}"
             mutant_dir = out_root / mutant_name
 
@@ -263,6 +275,13 @@ def run(target: str, operators_dir: str, out_dir: str,
                 (mutant_dir / "change.diff").write_text(diff, encoding="utf-8")
 
             results.append(record)
+
+    if fill_errors:
+        (out_root / "fill_errors.json").write_text(json.dumps(fill_errors, indent=2),
+                                                  encoding="utf-8")
+        ops = sorted({e["operator"] for e in fill_errors})
+        print(f"WARNING: {len(fill_errors)} candidate(s) skipped because the operator "
+              f"could not be filled ({', '.join(ops)}); see {out_root / 'fill_errors.json'}")
 
     return results
 
