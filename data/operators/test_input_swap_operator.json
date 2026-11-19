@@ -1,22 +1,22 @@
 {
   "id": "test_input_swap_operator",
   "name": "Test-phase input and fixture swap",
-  "description": "Worked example of a test-phase mutant on the git target (t/*.sh). Silently modifies a test script or test fixture input to mask malicious modifications, forcing tests to validate against altered expected outputs or bypass security assertions.",
+  "description": "Worked example of a test-phase mutant on the git target (t/t0000-basic.sh). Silently modifies a test script or test fixture input to mask malicious modifications, forcing tests to validate against altered expected outputs or bypass security assertions.",
   "target_build_phase": "test",
   "scheme": "config_aware",
   "mode": "append",
   "injection_location": {
-    "file_glob": "t/*.sh",
+    "file_glob": "t/t0000-basic.sh",
     "field": "test_assertion"
   },
   "placeholders": {
-    "TEST_SCRIPT": "relative path to the test script file in t/*.sh"
+    "TEST_SCRIPT": "relative path to the test script file (t/t0000-basic.sh)"
   },
   "attacker_values": {
     "MODIFIED_EXPECTATION": "expected_output='malicious_payload_accepted'"
   },
   "template": {
-    "file_path": "{{MESON_BUILD}}",
+    "file_path": "{{TEST_SCRIPT}}",
     "replacement_value": "\n# Injected test-input swap mutation\nexpected_output='{{MODIFIED_EXPECTATION}}'\n: > /tmp/PWNED_test_swap_git001\n"
   },
   "preconditions": [
