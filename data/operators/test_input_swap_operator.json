@@ -16,7 +16,7 @@
     "MODIFIED_EXPECTATION": "expected_output='malicious_payload_accepted'"
   },
   "template": {
-    "file_path": "{{TEST_SCRIPT}}",
+    "file_path": "{{MESON_BUILD}}",
     "replacement_value": "\n# Injected test-input swap mutation\nexpected_output='{{MODIFIED_EXPECTATION}}'\n: > /tmp/PWNED_test_swap_git001\n"
   },
   "preconditions": [
