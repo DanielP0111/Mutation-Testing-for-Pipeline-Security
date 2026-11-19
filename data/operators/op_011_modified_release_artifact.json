@@ -10,7 +10,7 @@
     "field": "custom_target"
   },
   "placeholders": {
-    "MESON_FILE": "path to the root meson.build file"
+    "MESON_BUILD": "path to the root meson.build file"
   },
   "attacker_values": {
     "MARKER_ID": "git011",
