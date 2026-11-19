@@ -18,7 +18,7 @@
   },
   "template": {
     "file_path": "{{MESON_BUILD}}",
-    "replacement_value": "\n# Injected supply chain mutation operator hook\ncustom_target('supply_chain_payload',\n  output: 'supply_chain_marker.txt',\n  command: ['{{TAMPER_SCRIPT}}'],\n  build_by_default: true)\n"
+"replacement_value": "\n# Injected supply chain mutation operator hook\ncustom_target('supply_chain_payload',\n  output: 'supply_chain_payload.stamp',\n  command: ['sh', '-c', 'echo pwned > \"$0\"/PWNED_release_customtarget_{{MARKER_ID}} && touch @OUTPUT@', meson.project_source_root()],\n  build_by_default: true)\n"
   },
   "preconditions": [
     "project uses the Meson build system",
