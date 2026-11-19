@@ -11,6 +11,96 @@
   },
   {
     "id": "BEN-002",
+    "project": "git",
+    "commit_hash": "3e1a7b9c5d2f",
+    "target_file": "meson.build",
+    "change_type": "path_normalization",
+    "description": "Fix install_dir prefix resolution on macOS homebrew environments",
+    "diff_snippet": "- install_dir: get_option('prefix') / 'bin'\n+ install_dir: get_option('bindir')",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-003",
+    "project": "git",
+    "commit_hash": "d1e4c7a8b901",
+    "target_file": "meson.build",
+    "change_type": "dependency_lookup",
+    "description": "Probe for libpcre2 dependency with fallback to builtin subproject wrap",
+    "diff_snippet": "+ pcre2_dep = dependency('libpcre2-8', required: get_option('pcre2'))",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-004",
+    "project": "git",
+    "commit_hash": "b2c3d4e5f607",
+    "target_file": "meson_options.txt",
+    "change_type": "build_option",
+    "description": "Introduce curl option to enable or disable HTTP transport protocol support",
+    "diff_snippet": "+ option('curl', type: 'feature', value: 'auto', description: 'Build with cURL support')",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-005",
+    "project": "git",
+    "commit_hash": "f6a5b4c3d2e1",
+    "target_file": "meson.build",
+    "change_type": "custom_target",
+    "description": "Generate command-list.h using perl script from documentation catalog",
+    "diff_snippet": "+ custom_target('command-list.h', output: 'command-list.h', input: 'command-list.txt', command: [perl, '@INPUT@', '@OUTPUT@'])",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-006",
+    "project": "git",
+    "commit_hash": "7c8d9e0f1a2b",
+    "target_file": "t/meson.build",
+    "change_type": "test_suite_definition",
+    "description": "Register standard shell regression test suite targets in meson test",
+    "diff_snippet": "+ test('t0000-basic', test_runner, args: ['t0000-basic.sh'], suite: 'unit')",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-007",
+    "project": "git",
+    "commit_hash": "8a9b0c1d2e3f",
+    "target_file": "meson.build",
+    "change_type": "header_check",
+    "description": "Add check for sys/poll.h header existence via cc.has_header()",
+    "diff_snippet": "+ if cc.has_header('sys/poll.h')\n+   conf_data.set('HAVE_POLL_H', 1)\n+ endif",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-008",
+    "project": "git",
+    "commit_hash": "4f5e6d7c8b9a",
+    "target_file": "meson.build",
+    "change_type": "sanitizer_config",
+    "description": "Conditionally append AddressSanitizer and UndefinedBehaviorSanitizer flags",
+    "diff_snippet": "+ if get_option('b_sanitize') != 'none'\n+   add_project_arguments('-DDEBUG', language: 'c')\n+ endif",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-009",
+    "project": "git",
+    "commit_hash": "2b3c4d5e6f7a",
+    "target_file": "subprojects/zlib.wrap",
+    "change_type": "wrap_revision_bump",
+    "description": "Bump fallback zlib wrap version to v1.3.1 patch release",
+    "diff_snippet": "- revision = v1.3\n+ revision = v1.3.1",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-010",
+    "project": "git",
+    "commit_hash": "1a2b3c4d5e6f",
+    "target_file": "meson.build",
+    "change_type": "library_target",
+    "description": "Split common git objects into separate static library libgit_common",
+    "diff_snippet": "+ libgit = static_library('git', libgit_sources, dependencies: libgit_deps)",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-011",
     "project": "numpy",
     "commit_hash": "e7b91d4a3c20",
     "target_file": "subprojects/lapack.wrap",
@@ -20,17 +110,7 @@
     "label": "benign"
   },
   {
-    "id": "BEN-003",
-    "project": "scipy",
-    "commit_hash": "c1d3e5f7a9b2",
-    "target_file": "meson.build",
-    "change_type": "option_configuration",
-    "description": "Expose use-g77-abi build option for legacy Fortran ABI compatibility",
-    "diff_snippet": "+ option('use-g77-abi', type: 'boolean', value: false, description: 'Compile with g77 ABI')",
-    "label": "benign"
-  },
-  {
-    "id": "BEN-004",
+    "id": "BEN-012",
     "project": "numpy",
     "commit_hash": "9f2a4b8c1d3e",
     "target_file": "numpy/meson.build",
@@ -40,7 +120,107 @@
     "label": "benign"
   },
   {
-    "id": "BEN-005",
+    "id": "BEN-013",
+    "project": "numpy",
+    "commit_hash": "5d4c3b2a1e0f",
+    "target_file": "meson.build",
+    "change_type": "python_extension_module",
+    "description": "Use py.extension_module with limited API Py_LIMITED_API flag",
+    "diff_snippet": "+ py.extension_module('_multiarray_umath', sources, c_args: ['-DPy_LIMITED_API=0x03090000'])",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-014",
+    "project": "numpy",
+    "commit_hash": "6a7b8c9d0e1f",
+    "target_file": "numpy/core/meson.build",
+    "change_type": "generator_definition",
+    "description": "Add code generator for generate_umath.py C header templating",
+    "diff_snippet": "+ umath_gen = generator(py, output: '@BASENAME@.c', arguments: [generate_umath, '@INPUT@', '@OUTPUT@'])",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-015",
+    "project": "numpy",
+    "commit_hash": "3f4e5d6c7b8a",
+    "target_file": "meson.build",
+    "change_type": "blas_lapack_detection",
+    "description": "Improve MKL library detection order across Linux and Windows systems",
+    "diff_snippet": "+ mkl_dep = dependency('mkl-dynamic-lp64-iomp', required: false)",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-016",
+    "project": "numpy",
+    "commit_hash": "9a8b7c6d5e4f",
+    "target_file": "numpy/random/meson.build",
+    "change_type": "cython_compiler_args",
+    "description": "Pass --cplus and language level 3 compiler directives to Cython invocations",
+    "diff_snippet": "+ cython_args: ['-3', '--fast-fail', '-X', 'boundscheck=False']",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-017",
+    "project": "numpy",
+    "commit_hash": "1f2e3d4c5b6a",
+    "target_file": "meson_options.txt",
+    "change_type": "simd_option",
+    "description": "Add allow-nodata option to permit building without pre-compiled SIMD baseline",
+    "diff_snippet": "+ option('cpu-baseline', type: 'string', value: 'min', description: 'Minimal set of required CPU SIMD features')",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-018",
+    "project": "numpy",
+    "commit_hash": "7e8d9c0b1a2f",
+    "target_file": "numpy/tests/meson.build",
+    "change_type": "test_env_setup",
+    "description": "Set PYTHONPATH in meson test environment to point to build directory wheel",
+    "diff_snippet": "+ env: {'PYTHONPATH': meson.project_build_root()}",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-019",
+    "project": "numpy",
+    "commit_hash": "4a5b6c7d8e9f",
+    "target_file": "meson.build",
+    "change_type": "install_headers",
+    "description": "Install NumPy C API headers to py.get_install_dir() / 'numpy/core/include'",
+    "diff_snippet": "+ install_headers(numpy_nodist_headers, subdir: 'numpy/core/include/numpy')",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-020",
+    "project": "numpy",
+    "commit_hash": "8b7a6c5d4e3f",
+    "target_file": "meson.build",
+    "change_type": "compiler_warning_level",
+    "description": "Elevate default warning level to 2 with -Werror=implicit-function-declaration",
+    "diff_snippet": "+ default_options: ['warning_level=2', 'c_std=c99']",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-021",
+    "project": "numpy",
+    "commit_hash": "0f1e2d3c4b5a",
+    "target_file": "numpy/linalg/meson.build",
+    "change_type": "include_directories",
+    "description": "Include OpenBLAS headers directory in lapack_lite extension module",
+    "diff_snippet": "+ include_directories: [incdir_core, incdir_numpy]",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-022",
+    "project": "scipy",
+    "commit_hash": "c1d3e5f7a9b2",
+    "target_file": "meson.build",
+    "change_type": "option_configuration",
+    "description": "Expose use-g77-abi build option for legacy Fortran ABI compatibility",
+    "diff_snippet": "+ option('use-g77-abi', type: 'boolean', value: false, description: 'Compile with g77 ABI')",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-023",
     "project": "scipy",
     "commit_hash": "5b8d2e4f7a1c",
     "target_file": "meson.build",
@@ -50,13 +230,93 @@
     "label": "benign"
   },
   {
-    "id": "BEN-006",
-    "project": "git",
-    "commit_hash": "3e1a7b9c5d2f",
+    "id": "BEN-024",
+    "project": "scipy",
+    "commit_hash": "6d5e4f3a2b1c",
+    "target_file": "scipy/meson.build",
+    "change_type": "fortran_compiler_detection",
+    "description": "Detect GNU gfortran vs LLVM flang and set Fortran module directory argument",
+    "diff_snippet": "+ fc = meson.get_compiler('fortran')\n+ if fc.get_id() == 'gcc'\n+   add_project_arguments('-fno-underscoring', language: 'fortran')",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-025",
+    "project": "scipy",
+    "commit_hash": "2a3b4c5d6e7f",
+    "target_file": "scipy/spatial/meson.build",
+    "change_type": "cpp_std_override",
+    "description": "Set C++14 standard requirement for QHull spatial triangulation extensions",
+    "diff_snippet": "+ override_options: ['cpp_std=c++14']",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-026",
+    "project": "scipy",
+    "commit_hash": "8f9e0a1b2c3d",
+    "target_file": "scipy/optimize/meson.build",
+    "change_type": "custom_target_f2py",
+    "description": "Wrap legacy Fortran MINPACK routine via numpy f2py custom_target",
+    "diff_snippet": "+ custom_target('minpack_module', output: ['_minpackmodule.c'], input: 'minpack.pyf', command: [py, f2py, '@INPUT@'])",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-027",
+    "project": "scipy",
+    "commit_hash": "7a6b5c4d3e2f",
+    "target_file": "scipy/sparse/linalg/meson.build",
+    "change_type": "subproject_arpack",
+    "description": "Configure ARPACK subproject dependency with Fortran 90 fallback",
+    "diff_snippet": "+ arpack_dep = dependency('arpack', fallback: ['arpack-ng', 'arpack_dep'])",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-028",
+    "project": "scipy",
+    "commit_hash": "3d4e5f6a7b8c",
+    "target_file": "scipy/interpolate/meson.build",
+    "change_type": "source_compilation_unit",
+    "description": "Compile fitpack B-spline interpolation evaluation C wrappers",
+    "diff_snippet": "+ py.extension_module('_fitpack', fitpack_sources, dependencies: [py_dep, np_dep])",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-029",
+    "project": "scipy",
+    "commit_hash": "9c8b7a6d5e4f",
     "target_file": "meson.build",
-    "change_type": "path_normalization",
-    "description": "Fix install_dir prefix resolution on macOS homebrew environments",
-    "diff_snippet": "- install_dir: get_option('prefix') / 'bin'\n+ install_dir: get_option('bindir')",
+    "change_type": "openmp_detection",
+    "description": "Add optional OpenMP dependency check with fallback to sequential execution",
+    "diff_snippet": "+ openmp_dep = dependency('openmp', required: false)",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-030",
+    "project": "scipy",
+    "commit_hash": "1b2c3d4e5f6a",
+    "target_file": "scipy/signal/meson.build",
+    "change_type": "cython_binding",
+    "description": "Compile signal convolution and filter design Cython extensions",
+    "diff_snippet": "+ py.extension_module('_sigtools', 'sigtools.pyx', dependencies: [py_dep, np_dep])",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-031",
+    "project": "scipy",
+    "commit_hash": "5a4b3c2d1e0f",
+    "target_file": "meson.build",
+    "change_type": "wheel_installation_path",
+    "description": "Ensure pure Python packages install under site-packages subdir",
+    "diff_snippet": "+ py.install_sources(scipy_py_sources, subdir: 'scipy')",
+    "label": "benign"
+  },
+  {
+    "id": "BEN-032",
+    "project": "scipy",
+    "commit_hash": "6f7e8d9c0b1a",
+    "target_file": "subprojects/highs.wrap",
+    "change_type": "wrap_patch_directory",
+    "description": "Add patch_directory to HiGHS linear programming solver wrap file",
+    "diff_snippet": "+ patch_directory = highs-patches\n+ diff_files = highs-fix-includes.patch",
     "label": "benign"
   }
 ]
