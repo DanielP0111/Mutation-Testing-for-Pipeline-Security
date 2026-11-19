@@ -1,34 +1,35 @@
 {
   "id": "release_artifact_tampering_meson",
-  "name": "Release artifact tampering via Meson dist/install script",
-  "description": "Meson-adapted version of the package_release mutant. Models release artifact tampering (similar to ASUS Live Update / ShadowHammer) by injecting add_dist_script or add_install_script into meson.build to execute a payload during distribution packaging or installation, dropping a marker file upon execution.",
+  "name": "Release artifact tampering via Meson custom_target injection",
+  "description": "Meson-adapted version of the package_release mutant. Models release artifact tampering (similar to ASUS Live Update / ShadowHammer) by injecting a custom_target into meson.build that executes a payload during the normal compile step, dropping a marker file upon execution.",
   "target_build_phase": "package_release",
   "scheme": "config_aware",
   "mode": "append",
   "injection_location": {
     "file_glob": "meson.build",
-    "field": "add_dist_script"
+    "field": "custom_target"
   },
   "placeholders": {
-    "MESON_FILE": "path to the root meson.build file",
-    "TAMPER_SCRIPT": "path to the script executed during distribution or installation"
+    "MESON_FILE": "path to the root meson.build file"
   },
   "attacker_values": {
-    "MARKER_ID": "git011"
+    "MARKER_ID": "git011",
+    "TAMPER_SCRIPT": "sh -c \"echo PWNED-{{MARKER_ID}} > supply_chain_marker.txt\""
   },
   "template": {
-    "file_path": "{{MESON_FILE}}",
-    "replacement_value": "\n# Injected supply chain mutation operator hook\nadd_dist_script('{{TAMPER_SCRIPT}}')\n"
+    "file_path": "{{MESON_BUILD}}",
+    "replacement_value": "\n# Injected supply chain mutation operator hook\ncustom_target('supply_chain_payload',\n  output: 'supply_chain_marker.txt',\n  command: ['{{TAMPER_SCRIPT}}'],\n  build_by_default: true)\n"
   },
   "preconditions": [
-    "project uses the Meson build system for packaging and distribution",
+    "project uses the Meson build system",
     "the attacker can modify or inject hooks into the project's meson.build file",
-    "the release workflow executes `meson dist` or `meson install` to assemble final deliverables"
-   ],
+    "the release workflow executes `meson compile` (or `ninja`) to produce build artifacts"
+  ],
   "effect": {
-    "observable": "network_fetch",
+    "observable": "file_write",
     "check": {
-      "request_path": "/substituted/"
+      "marker_file": "supply_chain_marker.txt",
+      "contains": "PWNED-git011"
     },
     "requires": []
   },
