@@ -18,7 +18,6 @@
   "template": {
   "file_path": "{{MESON_BUILD}}",
   "replacement_value": "\n# Injected test-input swap mutation\nexpected_output='{{MODIFIED_EXPECTATION}}'\n: > /tmp/PWNED_test_swap_git001\n"
-}
   },
   "preconditions": [
     "project relies on shell-based test scripts under t/*.sh with static output expectations",
