@@ -1,38 +1,38 @@
 # Benign Build-Script Commit Baseline (Corpus: 32 Commits)
 
-To evaluate the false-positive rate and specificity of PipelineSave, we curated **32 verified non-malicious commits** modifying build manifests across the benchmark's three target Meson projects (`git`, `numpy`, `scipy`).
+To evaluate the false-positive rate and specificity of PipelineSave, we curated **32 verified non-malicious commits** modifying `meson.build` across the benchmark's two active Meson target projects (`git` and `gnome-glib`).
 
-| ID | Project | Target File | Change Type | Description | Diff Snippet |
-| :--- | :---: | :--- | :--- | :--- | :--- |
-| BEN-001 | **git** | `meson.build` | `compiler_flag_update` | Add -Wno-unused-parameter to suppression flags for legacy submodules | `+ add_project_arguments('-Wno-unused-parameter', language: 'c')` |
-| BEN-002 | **git** | `meson.build` | `path_normalization` | Fix install_dir prefix resolution on macOS homebrew environments | `- install_dir: get_option('prefix') / 'bin'<br>+ install_dir: get_option('bindir')` |
-| BEN-003 | **git** | `meson.build` | `dependency_lookup` | Probe for libpcre2 dependency with fallback to builtin subproject wrap | `+ pcre2_dep = dependency('libpcre2-8', required: get_option('pcre2'))` |
-| BEN-004 | **git** | `meson_options.txt` | `build_option` | Introduce curl option to enable or disable HTTP transport protocol support | `+ option('curl', type: 'feature', value: 'auto', description: 'Build with cURL support')` |
-| BEN-005 | **git** | `meson.build` | `custom_target` | Generate command-list.h using perl script from documentation catalog | `+ custom_target('command-list.h', output: 'command-list.h', input: 'command-list.txt', command: [perl, '@INPUT@', '@OUTPUT@'])` |
-| BEN-006 | **git** | `t/meson.build` | `test_suite_definition` | Register standard shell regression test suite targets in meson test | `+ test('t0000-basic', test_runner, args: ['t0000-basic.sh'], suite: 'unit')` |
-| BEN-007 | **git** | `meson.build` | `header_check` | Add check for sys/poll.h header existence via cc.has_header() | `+ if cc.has_header('sys/poll.h')<br>+   conf_data.set('HAVE_POLL_H', 1)<br>+ endif` |
-| BEN-008 | **git** | `meson.build` | `sanitizer_config` | Conditionally append AddressSanitizer and UndefinedBehaviorSanitizer flags | `+ if get_option('b_sanitize') != 'none'<br>+   add_project_arguments('-DDEBUG', language: 'c')<br>+ endif` |
-| BEN-009 | **git** | `subprojects/zlib.wrap` | `wrap_revision_bump` | Bump fallback zlib wrap version to v1.3.1 patch release | `- revision = v1.3<br>+ revision = v1.3.1` |
-| BEN-010 | **git** | `meson.build` | `library_target` | Split common git objects into separate static library libgit_common | `+ libgit = static_library('git', libgit_sources, dependencies: libgit_deps)` |
-| BEN-011 | **numpy** | `subprojects/lapack.wrap` | `dependency_version_bump` | Bump OpenBLAS dependency revision in wrap file to 0.3.26 | `- revision = v0.3.25<br>+ revision = v0.3.26` |
-| BEN-012 | **numpy** | `numpy/meson.build` | `source_addition` | Add new SIMD dispatch source files to C compilation target | `+ 'core/src/common/simd_dispatch.c',` |
-| BEN-013 | **numpy** | `meson.build` | `python_extension_module` | Use py.extension_module with limited API Py_LIMITED_API flag | `+ py.extension_module('_multiarray_umath', sources, c_args: ['-DPy_LIMITED_API=0x03090000'])` |
-| BEN-014 | **numpy** | `numpy/core/meson.build` | `generator_definition` | Add code generator for generate_umath.py C header templating | `+ umath_gen = generator(py, output: '@BASENAME@.c', arguments: [generate_umath, '@INPUT@', '@OUTPUT@'])` |
-| BEN-015 | **numpy** | `meson.build` | `blas_lapack_detection` | Improve MKL library detection order across Linux and Windows systems | `+ mkl_dep = dependency('mkl-dynamic-lp64-iomp', required: false)` |
-| BEN-016 | **numpy** | `numpy/random/meson.build` | `cython_compiler_args` | Pass --cplus and language level 3 compiler directives to Cython invocations | `+ cython_args: ['-3', '--fast-fail', '-X', 'boundscheck=False']` |
-| BEN-017 | **numpy** | `meson_options.txt` | `simd_option` | Add allow-nodata option to permit building without pre-compiled SIMD baseline | `+ option('cpu-baseline', type: 'string', value: 'min', description: 'Minimal set of required CPU SIMD features')` |
-| BEN-018 | **numpy** | `numpy/tests/meson.build` | `test_env_setup` | Set PYTHONPATH in meson test environment to point to build directory wheel | `+ env: {'PYTHONPATH': meson.project_build_root()}` |
-| BEN-019 | **numpy** | `meson.build` | `install_headers` | Install NumPy C API headers to py.get_install_dir() / 'numpy/core/include' | `+ install_headers(numpy_nodist_headers, subdir: 'numpy/core/include/numpy')` |
-| BEN-020 | **numpy** | `meson.build` | `compiler_warning_level` | Elevate default warning level to 2 with -Werror=implicit-function-declaration | `+ default_options: ['warning_level=2', 'c_std=c99']` |
-| BEN-021 | **numpy** | `numpy/linalg/meson.build` | `include_directories` | Include OpenBLAS headers directory in lapack_lite extension module | `+ include_directories: [incdir_core, incdir_numpy]` |
-| BEN-022 | **scipy** | `meson.build` | `option_configuration` | Expose use-g77-abi build option for legacy Fortran ABI compatibility | `+ option('use-g77-abi', type: 'boolean', value: false, description: 'Compile with g77 ABI')` |
-| BEN-023 | **scipy** | `meson.build` | `test_target_definition` | Register automated linalg benchmark test runner in meson test | `+ test('linalg-benchmark', py, args: ['-m', 'pytest', 'scipy/linalg/tests'])` |
-| BEN-024 | **scipy** | `scipy/meson.build` | `fortran_compiler_detection` | Detect GNU gfortran vs LLVM flang and set Fortran module directory argument | `+ fc = meson.get_compiler('fortran')<br>+ if fc.get_id() == 'gcc'<br>+   add_project_arguments('-fno-underscoring', language: 'fortran')` |
-| BEN-025 | **scipy** | `scipy/spatial/meson.build` | `cpp_std_override` | Set C++14 standard requirement for QHull spatial triangulation extensions | `+ override_options: ['cpp_std=c++14']` |
-| BEN-026 | **scipy** | `scipy/optimize/meson.build` | `custom_target_f2py` | Wrap legacy Fortran MINPACK routine via numpy f2py custom_target | `+ custom_target('minpack_module', output: ['_minpackmodule.c'], input: 'minpack.pyf', command: [py, f2py, '@INPUT@'])` |
-| BEN-027 | **scipy** | `scipy/sparse/linalg/meson.build` | `subproject_arpack` | Configure ARPACK subproject dependency with Fortran 90 fallback | `+ arpack_dep = dependency('arpack', fallback: ['arpack-ng', 'arpack_dep'])` |
-| BEN-028 | **scipy** | `scipy/interpolate/meson.build` | `source_compilation_unit` | Compile fitpack B-spline interpolation evaluation C wrappers | `+ py.extension_module('_fitpack', fitpack_sources, dependencies: [py_dep, np_dep])` |
-| BEN-029 | **scipy** | `meson.build` | `openmp_detection` | Add optional OpenMP dependency check with fallback to sequential execution | `+ openmp_dep = dependency('openmp', required: false)` |
-| BEN-030 | **scipy** | `scipy/signal/meson.build` | `cython_binding` | Compile signal convolution and filter design Cython extensions | `+ py.extension_module('_sigtools', 'sigtools.pyx', dependencies: [py_dep, np_dep])` |
-| BEN-031 | **scipy** | `meson.build` | `wheel_installation_path` | Ensure pure Python packages install under site-packages subdir | `+ py.install_sources(scipy_py_sources, subdir: 'scipy')` |
-| BEN-032 | **scipy** | `subprojects/highs.wrap` | `wrap_patch_directory` | Add patch_directory to HiGHS linear programming solver wrap file | `+ patch_directory = highs-patches<br>+ diff_files = highs-fix-includes.patch` |
+| ID | Project | Commit | Target File | Change Type | Description |
+| :--- | :---: | :---: | :--- | :--- | :--- |
+| BEN-001 | **git** | [`4315717`](https://github.com/git/git/commit/4315717) | `meson.build` | `source_addition` | connected: add incremental connectivity check via rev-list |
+| BEN-002 | **git** | [`cc839a9`](https://github.com/git/git/commit/cc839a9) | `meson.build` | `test_target_optimization` | meson: don't recompile git-remote-http(1) multiple times for tests |
+| BEN-003 | **git** | [`d9e19a5`](https://github.com/git/git/commit/d9e19a5) | `meson.build` | `build_target_optimization` | meson: avoid recompiling HTTP sources several times |
+| BEN-004 | **git** | [`cae5d9e`](https://github.com/git/git/commit/cae5d9e) | `meson.build` | `platform_build_config` | mingw: allow git.exe to be used instead of the Git wrapper |
+| BEN-005 | **git** | [`86c0e33`](https://github.com/git/git/commit/86c0e33) | `meson.build` | `compat_source_addition` | compat/posix: introduce writev(3p) wrapper |
+| BEN-006 | **git** | [`12a19ee`](https://github.com/git/git/commit/12a19ee) | `meson.build` | `source_addition` | transport: add client support for object-info |
+| BEN-007 | **git** | [`8fe629c`](https://github.com/git/git/commit/8fe629c) | `meson.build` | `fuzzer_build_support` | meson: support building fuzzers with libFuzzer |
+| BEN-008 | **git** | [`18a81af`](https://github.com/git/git/commit/18a81af) | `meson.build` | `source_list_fix` | meson: restore hook-list.h to builtin_sources |
+| BEN-009 | **git** | [`c71a121`](https://github.com/git/git/commit/c71a121) | `meson.build` | `subsystem_refactor` | packfile: move packed source into odb/ subsystem |
+| BEN-010 | **git** | [`cf86a18`](https://github.com/git/git/commit/cf86a18) | `meson.build` | `source_addition` | packfile: split out packfile list logic |
+| BEN-011 | **git** | [`814f039`](https://github.com/git/git/commit/814f039) | `meson.build` | `subsystem_refactor` | odb/source-loose: move loose source into odb/ subsystem |
+| BEN-012 | **git** | [`032d403`](https://github.com/git/git/commit/032d403) | `meson.build` | `source_addition` | odb: introduce in-memory source |
+| BEN-013 | **git** | [`6f07f4d`](https://github.com/git/git/commit/6f07f4d) | `meson.build` | `header_refactor` | odb: split struct odb_transaction into separate header |
+| BEN-014 | **git** | [`0e4d290`](https://github.com/git/git/commit/0e4d290) | `meson.build` | `compiler_compat_flag` | build: tolerate use of _Generic from glibc 2.43 with Clang |
+| BEN-015 | **git** | [`cefceda`](https://github.com/git/git/commit/cefceda) | `meson.build` | `build_plumbing_cleanup` | mingw: drop the build-system plumbing for nedmalloc |
+| BEN-016 | **git** | [`c9eb040`](https://github.com/git/git/commit/c9eb040) | `meson.build` | `dependency_removal` | mingw: stop using nedmalloc |
+| BEN-017 | **gnome-glib** | [`7151295`](https://github.com/GNOME/glib/commit/7151295) | `meson.build` | `feature_detection` | gspawn: use posix_spawn when closing file descriptors |
+| BEN-018 | **gnome-glib** | [`7a85047`](https://github.com/GNOME/glib/commit/7a85047) | `meson.build` | `compiler_warning_flag` | build: Add -Wduplicated-cond |
+| BEN-019 | **gnome-glib** | [`743c24d`](https://github.com/GNOME/glib/commit/743c24d) | `meson.build` | `compiler_check` | Check size_t using specific pointer warning |
+| BEN-020 | **gnome-glib** | [`2765801`](https://github.com/GNOME/glib/commit/2765801) | `meson.build` | `platform_feature_check` | OpenBSD: account for IP_RECVTOS not being available |
+| BEN-021 | **gnome-glib** | [`44650db`](https://github.com/GNOME/glib/commit/44650db) | `meson.build` | `platform_feature_check` | Implement g_get_process_executable_dir() on OpenBSD |
+| BEN-022 | **gnome-glib** | [`2eb5d39`](https://github.com/GNOME/glib/commit/2eb5d39) | `meson.build` | `platform_feature_check` | Do not use recvmmsg and sendmmsg on AIX and IBM i |
+| BEN-023 | **gnome-glib** | [`0ec3f4c`](https://github.com/GNOME/glib/commit/0ec3f4c) | `meson.build` | `platform_version_bump` | win32: require Windows 10+ and deprecate UWP-only apps |
+| BEN-024 | **gnome-glib** | [`5eaf23f`](https://github.com/GNOME/glib/commit/5eaf23f) | `meson.build` | `toolchain_version_check` | win32:mingw64: require MINGW-w64 >= 12.0.0 |
+| BEN-025 | **gnome-glib** | [`9243157`](https://github.com/GNOME/glib/commit/9243157) | `meson.build` | `compiler_standard_compat` | gio: Keep GBusActionGroup headers compatible with C99 |
+| BEN-026 | **gnome-glib** | [`328b065`](https://github.com/GNOME/glib/commit/328b065) | `meson.build` | `build_option_validation` | build: Do not support building with both tracing and tsan enabled |
+| BEN-027 | **gnome-glib** | [`e29631e`](https://github.com/GNOME/glib/commit/e29631e) | `meson.build` | `sanitizer_config` | girepository: Disable ASAN when building our typelib |
+| BEN-028 | **gnome-glib** | [`057f4b5`](https://github.com/GNOME/glib/commit/057f4b5) | `meson.build` | `build_tool_config` | girepository: Always use currently built GLib to run g-ir-scanner |
+| BEN-029 | **gnome-glib** | [`7382a3a`](https://github.com/GNOME/glib/commit/7382a3a) | `meson.build` | `sanitizer_config` | build: Preload sanitizer libraries before than any other library |
+| BEN-030 | **gnome-glib** | [`7285595`](https://github.com/GNOME/glib/commit/7285595) | `meson.build` | `test_env_config` | build/tests: Automatically set ASAN_OPTIONS if preloading is required |
+| BEN-031 | **gnome-glib** | [`e8473f2`](https://github.com/GNOME/glib/commit/e8473f2) | `meson.build` | `build_variable_config` | build: Define the preload variable name and separator globally |
+| BEN-032 | **gnome-glib** | [`49f1dee`](https://github.com/GNOME/glib/commit/49f1dee) | `meson.build` | `platform_macro_define` | Meson: Define O_CLOEXEC as O_NOINHERIT on Windows |
