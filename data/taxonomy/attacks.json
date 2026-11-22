@@ -3,7 +3,7 @@
     "id": "ATK-001",
     "name": "event-stream / Copay",
     "year": 2018,
-    "cve": "CVE-2018-3721",
+    "cve": "None",
     "source_url": "https://github.com/advisories/GHSA-mh6f-8j2x-4483",
     "build_phase": "dependency_fetch",
     "attack_vector": "Social engineering maintainer transfer leading to transitive flatmap-stream injection",
@@ -45,7 +45,7 @@
     "attack_vector": "Dependency confusion on PyPI matching internal torchtriton package name",
     "dataflow_pattern": "dependency_injection",
     "detection_difficulty": 2,
-    "notes": "Public PyPI registry package prioritized over internal internal nightly wheel server"
+    "notes": "Public PyPI registry package prioritized over internal nightly wheel server"
   },
   {
     "id": "ATK-005",
@@ -57,19 +57,19 @@
     "attack_vector": "Protestware / intentional upstream developer sabotage introducing infinite loop",
     "dataflow_pattern": "code_insertion",
     "detection_difficulty": 1,
-    "notes": "Developer pushed v1.4.44-liberty-2 introducing infinite loopcrashing downstream consumer builds"
+    "notes": "Developer pushed v1.4.44-liberty-2 introducing infinite loop crashing downstream consumer builds"
   },
   {
     "id": "ATK-006",
     "name": "npm node-ipc Protestware",
     "year": 2022,
     "cve": "CVE-2022-23812",
-    "source_url": "https://snyk,io/blog/peacenotwar-malicious-npm-node-ipc-package-vulnerability/",
+    "source_url": "https://snyk.io/blog/peacenotwar-malicious-npm-node-ipc-package-vulnerability/",
     "build_phase": "dependency_fetch",
-    "attack_vector": "Protestware payload targeting Russian/Belarusian IP address with file wipe",
+    "attack_vector": "Protestware payload targeting Russian/Belarusian IP addresses with file wipe",
     "dataflow_pattern": "code_insertion",
     "detection_difficulty": 2,
-    "notes": "Triggered on dependency resolution to write hear emojis or overwrite disk contents"
+    "notes": "Triggered on dependency resolution to write heart emojis or overwrite disk contents"
   },
   {
     "id": "ATK-007",
@@ -105,7 +105,7 @@
     "attack_vector": "Alex Birsan dependency confusion research targeting 35+ tech enterprises",
     "dataflow_pattern": "dependency_injection",
     "detection_difficulty": 2,
-    "notes": "Exploited default pacjage manager behavior prioritizing public registry over private feeds"
+    "notes": "Exploited default package manager behavior prioritizing public registry over private feeds"
   },
   {
     "id": "ATK-010",
